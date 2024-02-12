@@ -337,7 +337,8 @@ QString StrConstants::getUnlockingPackage()
 }
 
 QString StrConstants::getSystemUpgrade(){
-  return QObject::tr("Installing updates...");
+  return QObject::tr("Checking for updates...");
+  //return QObject::tr("Installing updates...");
 }
 
 QString StrConstants::getInstallingPackages(){

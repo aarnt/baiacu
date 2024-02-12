@@ -424,7 +424,7 @@ private slots:
   void stopTransaction();
 
 public slots:
-  void doSystemUpgrade(SystemUpgradeOptions sysUpgradeOption = ectn_NO_OPT);
+  void doSystemUpgrade(); //(SystemUpgradeOptions sysUpgradeOption = ectn_NO_OPT);
 
 public:
   explicit MainWindow(QWidget *parent = 0);

@@ -638,7 +638,7 @@ void MainWindow::initActions()
   connect(ui->actionRemoveTransactionItem, &QAction::triggered, this, &MainWindow::onPressDelete);
   connect(ui->actionRemoveTransactionItems, &QAction::triggered, this, &MainWindow::onPressDelete);
   connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
-  connect(ui->actionCheckUpdates, &QAction::triggered, this, &MainWindow::doCheckUpdates);
+  connect(ui->actionCheckUpdates, &QAction::triggered, this, &MainWindow::doSystemUpgrade);
   connect(ui->actionSystemUpgrade, &QAction::triggered, this, &MainWindow::doPreSystemUpgrade);
   connect(ui->actionRemove, &QAction::triggered, this, &MainWindow::insertIntoRemovePackage);
   connect(ui->actionInstall, &QAction::triggered, this, &MainWindow::insertIntoInstallPackage);

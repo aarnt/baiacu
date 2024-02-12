@@ -655,10 +655,10 @@ void MainWindow::prepareSystemUpgrade()
 {
   m_systemUpgradeDialog = false;
 
-  m_lastCommandList.clear();
+  /*m_lastCommandList.clear();
   m_lastCommandList.append(ctn_PKG_BIN + " upgrade;");
   m_lastCommandList.append("echo -e;");
-  m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");
+  m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");*/
 
   m_unixCommand = new UnixCommand(this);
 
@@ -728,11 +728,28 @@ void MainWindow::stopTransaction()
 }
 
 /*
- * Does a system upgrade with "pacman -Su" !
+ * Does a system upgrade with "pkg_add u" !
  */
-void MainWindow::doSystemUpgrade(SystemUpgradeOptions systemUpgradeOptions)
+void MainWindow::doSystemUpgrade() //SystemUpgradeOptions systemUpgradeOptions)
 {
-  if (m_systemUpgradeDialog) return;
+  //Q_UNUSED(systemUpgradeOptions)
+
+  if (!isSUAvailable()) return;
+
+  prepareSystemUpgrade();
+
+  m_commandExecuting = ectn_SYSTEM_UPGRADE;
+  QStringList params;
+
+  params << ctn_PKG_ADD_BIN;
+  params << "-n";
+  params << "-u";
+  params << "-I";
+
+  m_unixCommand->executeCommand(params);
+  m_commandQueued = ectn_NONE;
+
+  /*if (m_systemUpgradeDialog) return;
 
   if(m_callSystemUpgrade && m_numberOfOutdatedPackages == 0)
   {
@@ -748,7 +765,7 @@ void MainWindow::doSystemUpgrade(SystemUpgradeOptions systemUpgradeOptions)
   if (!isSUAvailable()) return;
 
   //Shows a dialog indicating the targets needed to be retrieved and asks for the user's permission.
-  TransactionInfo ti = g_fwTargetUpgradeList.result(); //Package::getTargetUpgradeList();
+  //TransactionInfo ti = g_fwTargetUpgradeList.result(); //Package::getTargetUpgradeList();
   QStringList *targets = ti.packages;
 
   //There are no new updates to install!
@@ -791,8 +808,7 @@ void MainWindow::doSystemUpgrade(SystemUpgradeOptions systemUpgradeOptions)
   else
   {
     //Let's build the system upgrade transaction dialog...
-    /*totalDownloadSize = totalDownloadSize / 1024;
-      QString ds = Package::kbytesToSize(totalDownloadSize);*/
+
     QString ds = ti.sizeToDownload;
 
     TransactionDialog question(this);
@@ -850,7 +866,7 @@ void MainWindow::doSystemUpgrade(SystemUpgradeOptions systemUpgradeOptions)
       enableTransactionActions();
       toggleSystemActions(true);
     }
-  }
+  }*/
 }
 
 /*
@@ -1648,6 +1664,8 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   if (m_commandExecuting == ectn_RUN_IN_TERMINAL ||
       m_commandExecuting == ectn_RUN_SYSTEM_UPGRADE_IN_TERMINAL) return;
 
+  if (pMsg.at(0) == "[") return;
+
   bool continueTesting = false;
   QString perc;
   QString msg = pMsg;
@@ -1675,7 +1693,7 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   msg.remove("[c");
   msg.remove("[mo");
 
-  //qDebug() << "_treat: " << msg;
+  //std::cout << "_treat: " << msg.toLatin1().data() << std::endl;
 
   progressRun = "%";
   progressEnd = "100%";
@@ -1794,14 +1812,6 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
     msg.remove(QRegularExpression("qt.qpa.xcb:.+"));
     msg.remove(QRegularExpression("qt5ct: using qt5ct plugin"));
 
-    //Gksu buggy strings
-    /*msg.remove(QRegularExpression("couldn't lock.+"));
-    msg.remove(QRegularExpression("you should recompile libgtop and dependent applications.+"));
-    msg.remove(QRegularExpression("This libgtop was compiled on.+"));
-    msg.remove(QRegularExpression("If you see strange problems caused by it.+"));
-    msg.remove(QRegularExpression("LibGTop-Server.+"));
-    msg.remove(QRegularExpression("received eof.+"));
-    msg.remove(QRegularExpression("pid [0-9]+"));*/
     msg = msg.trimmed();
 
     //std::cout << "debug: " << msg.toLatin1().data() << std::endl;
@@ -1831,9 +1841,15 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
         }
       }
       else
-      {
+      {       
         QString altMsg = msg;
-        writeToTabOutputExt(altMsg); //BLACK
+
+        if (altMsg.startsWith("quirks"))
+        {
+          writeToTabOutputExt("<b><font color=\"#FF8040\">" + altMsg + "</font></b>");
+        }
+        else
+          writeToTabOutputExt(altMsg); //BLACK
       }
     }
   }

@@ -349,7 +349,7 @@ void QtSingleApplication::activateWindow(const QString &message)
     else
       actWin->activateWindow();
 
-    MainWindow *mw = qobject_cast<MainWindow *>(actWin);
+    /*MainWindow *mw = qobject_cast<MainWindow *>(actWin);
 
     if (mw)
     {
@@ -364,7 +364,7 @@ void QtSingleApplication::activateWindow(const QString &message)
           mw->doSystemUpgrade(ectn_NOCONFIRM_OPT);
         }
       }
-    }
+    }*/
   }
   else if (actWin && message == "CLOSE") {
     if (!actWin->close())

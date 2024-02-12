@@ -2,7 +2,7 @@
 
 ![Main window](https://raw.githubusercontent.com/aarnt/baiacu/main/baiacu-mainwindow.png)
 
-**Baiacu** is a Qt based GUI front end to the OpenBSD package manager, derived from [Octopkg](http://tintaescura.com/projects/octopkg).
+**Baiacu** is a Qt based GUI front end to the OpenBSD package manager, derived from [OctoPkg](http://tintaescura.com/projects/octopkg).
 It consists of a lxqt-sudo clone called [baiacu-doas](https://github.com/aarnt/baiacu/tree/main/doas) used to gain root privileges and a package browser application used
 to search, install, remove and update packages.
 The project is compatible with [OpenBSD](https://www.openbsd.org/).
