@@ -135,6 +135,8 @@ int UnixCommand::cancelProcess()
  */
 QByteArray UnixCommand::getRemotePackageList(const QString &searchString, bool useCommentSearch)
 {
+  Q_UNUSED(useCommentSearch)
+
   QByteArray result("");
 
   QStringList sl;
@@ -230,6 +232,8 @@ QByteArray UnixCommand::getPackageList(const QString &pkgName)
  */
 QByteArray UnixCommand::getPackageInformation(const QString &pkgName, bool foreignPackage = false)
 {
+  Q_UNUSED(foreignPackage)
+
   QStringList args;
   args << pkgName;
 

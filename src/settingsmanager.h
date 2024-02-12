@@ -85,12 +85,6 @@ class SettingsManager
     static int getPackageVersionColumnWidth();
     static int getPackageSizeColumnWidth();
 
-    //Notifier related
-    static int getSyncDbHour();
-    static int getSyncDbInterval();
-    static QDateTime getLastSyncDbTime();
-
-    //static bool getSkipMirrorCheckAtStartup();
     static bool getShowGroupsPanel();
     static QByteArray getWindowSize();
     static QByteArray getTransactionWindowSize();

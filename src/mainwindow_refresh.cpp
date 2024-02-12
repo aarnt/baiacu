@@ -106,6 +106,7 @@ void MainWindow::remoteSearchClicked()
     m_refreshPackageLists = true;
 
   metaBuildPackageList();
+  clearTabsInfoOrFilesExt();
   m_cachedPackageInInfo = "";
   m_cachedPackageInFiles = "";
   invalidateTabs();

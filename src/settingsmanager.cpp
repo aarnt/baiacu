@@ -53,89 +53,7 @@ SettingsManager* SettingsManager::instance(){
   return m_pinstance;
 }
 
-//Notifier related ------------------------------------------------------------------
-
-int SettingsManager::getSyncDbHour()
-{
-  SettingsManager p_instance;
-  int h = p_instance.getSYSsettings()->value(ctn_KEY_SYNC_DB_HOUR, -1).toInt();
-
-  if (h != -1)
-  {
-    if (h < 0)
-    {
-      h = 0;
-      p_instance.getSYSsettings()->setValue(ctn_KEY_SYNC_DB_HOUR, h);
-      p_instance.getSYSsettings()->sync();
-    }
-    else if (h > 23)
-    {
-      h = 23;
-      p_instance.getSYSsettings()->setValue(ctn_KEY_SYNC_DB_HOUR, h);
-      p_instance.getSYSsettings()->sync();
-    }
-  }
-
-  return h;
-}
-
-//The syncDb interval is in MINUTES and it cannot be less than 5!
-int SettingsManager::getSyncDbInterval()
-{
-  SettingsManager p_instance;
-  int n = p_instance.getSYSsettings()->value(ctn_KEY_SYNC_DB_INTERVAL, -1).toInt();
-
-  if ((n != -1) && (n < 5))
-  {
-    n = 5;
-    p_instance.getSYSsettings()->setValue(ctn_KEY_SYNC_DB_INTERVAL, n);
-    p_instance.getSYSsettings()->sync();
-  }
-  else if (n > 1380)
-  {
-    n = 1380; //This is 23 hours, the maximum allowed!
-    p_instance.getSYSsettings()->setValue(ctn_KEY_SYNC_DB_INTERVAL, n);
-    p_instance.getSYSsettings()->sync();
-  }
-
-  return n;
-}
-
-QDateTime SettingsManager::getLastSyncDbTime()
-{
-  if (!instance()->getSYSsettings()->contains(ctn_KEY_LAST_SYNC_DB_TIME))
-  {
-    return QDateTime();
-  }
-  else
-  {
-    SettingsManager p_instance;
-    return (p_instance.getSYSsettings()->value( ctn_KEY_LAST_SYNC_DB_TIME, 0)).toDateTime();
-  }
-}
-
-void SettingsManager::setSyncDbHour(int newValue)
-{
-  instance()->getSYSsettings()->setValue(ctn_KEY_SYNC_DB_HOUR, newValue);
-  instance()->getSYSsettings()->sync();
-}
-
-void SettingsManager::setSyncDbInterval(int newValue)
-{
-  instance()->getSYSsettings()->setValue(ctn_KEY_SYNC_DB_INTERVAL, newValue);
-  instance()->getSYSsettings()->sync();
-}
-
-void SettingsManager::setLastSyncDbTime(QDateTime newValue)
-{
-  instance()->getSYSsettings()->setValue(ctn_KEY_LAST_SYNC_DB_TIME, newValue);
-  instance()->getSYSsettings()->sync();
-}
-
-//Notifier related ------------------------------------------------------------------
-
-
-//OctoPkg related --------------------------------------------------------------------
+//Baiacu related --------------------------------------------------------------------
 int SettingsManager::getCurrentTabIndex(){
   return instance()->getSYSsettings()->value(
         ctn_KEY_CURRENT_TAB_INDEX, 0).toInt();
@@ -260,18 +178,6 @@ void SettingsManager::setTerminal(QString newValue){
   instance()->getSYSsettings()->sync();
 }
 
-void SettingsManager::setKeepNumInstalledPackages(int newValue)
-{
-  instance()->getSYSsettings()->setValue(ctn_KEEP_NUM_INSTALLED, newValue);
-  instance()->getSYSsettings()->sync();
-}
-
-void SettingsManager::setKeepNumUninstalledPackages(int newValue)
-{
-  instance()->getSYSsettings()->setValue(ctn_KEEP_NUM_UNINSTALLED, newValue);
-  instance()->getSYSsettings()->sync();
-}
-
 void SettingsManager::setPackageIconColumnWidth(int newValue)
 {
   instance()->getSYSsettings()->setValue(ctn_KEY_PACKAGE_ICON_COLUMN_WIDTH, newValue);
@@ -330,4 +236,4 @@ bool SettingsManager::isValidTerminalSelected()
   }
 }*/
 
-//OctoPkg related --------------------------------------------------------------------
+//Baiacu related --------------------------------------------------------------------

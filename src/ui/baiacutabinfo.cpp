@@ -45,6 +45,8 @@ BaiacuTabInfo::BaiacuTabInfo()
 QString BaiacuTabInfo::formatTabInfo(const PackageRepository::PackageData& package,
                                      const QMap<QString, OutdatedPackageInfo>& outdatedPkgList)
 {
+  Q_UNUSED(outdatedPkgList)
+
   PackageInfoData pid = Package::getInformation(package.name);
 
   QString version = StrConstants::getVersion();

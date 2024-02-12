@@ -33,11 +33,6 @@
 #include <QSet>
 
 const QString ctn_TEMP_ACTIONS_FILE ( QDir::homePath() + QDir::separator() + ".config/baiacu" + QDir::separator() + ".qt_temp_" );
-const QString ctn_PKGNG_DRAGONFLYBSD_CORE_DB_FILE = "/var/db/pkg/repo-Avalon.sqlite";
-const QString ctn_PKGNG_FREEBSD_CORE_DB_FILE = "/var/db/pkg/repo-FreeBSD.sqlite";
-const QString ctn_PKGNG_HARDENEDBSD_CORE_DB_FILE = "/var/db/pkg/repo-HardenedBSD.sqlite";
-const QString ctn_PKGNG_GHOSTBSD_CORE_DB_FILE = "/var/db/pkg/repo-GhostBSD.sqlite";
-const QString ctn_PKGNG_PCBSD_CORE_DB_FILE = "/var/db/pkg/repo-pcbsd-major.sqlite";
 const QString ctn_PKGNG_FAKE_REPOSITORY = "_WWW";
 
 enum PackageStatus { ectn_INSTALLED, ectn_NON_INSTALLED, ectn_OUTDATED, ectn_NEWER };
@@ -217,6 +212,7 @@ class Package{
     static QString kbytesToSize(float Bytes );
     static double strToKBytes(QString size);
     static double strToKBytes2(QString size);
+
     static QString makeAnchorOfDependencies(const QString &deps);
     static QString makeURLClickable(const QString &information);
     static QString getBaseName( const QString& pkgName );
