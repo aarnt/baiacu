@@ -69,16 +69,9 @@ void MainWindow::initTabHelpUsage()
      tr("An installed package") + QString("</li>") +
   QString("<li>") + iconPath + "unrequired.png\"/> " +
      tr("An explicitly installed package") +
-  //QString("<li>") + iconPath + "locker-key.png\"/> " +
-  //   tr("A locked installed package") +
-  //QString("</li>") +
   QString("</li>") +
   QString("<li>") + iconPath + "noninstalled.png\"/> " +
      tr("A non installed package") +
-  //QString("</li>") +
-  //QString("<li>") + iconPath + "outdated.png\"/> " +
-  //   tr("An outdated package") +
-  //QString("</li>") +
   QString("</li></ul>") +
 
      tr("Basic usage help:") +
@@ -121,15 +114,11 @@ void MainWindow::initTabHelpUsage()
   QString("</li><li>") +
      tr("Ctrl+L to find a package in the package list") +
   QString("</li><li>") +
-  //   tr("Ctrl+I to view installed packages") +
-  //QString("</li><li>") +
      tr("Ctrl+I to install a new package") +
   QString("</li><li>") +
      tr("Ctrl+P to go to the package list") +
   QString("</li><li>") +
      tr("Ctrl+F to search for text inside tab Files, News and Usage") +
-  //QString("</li><li>") +
-  //   tr("Ctrl+N or 'View/Non installed' to show/hide non installed packages") +
   QString("</li><li>") +
      tr("Ctrl+M or 'Actions/Apply' to start installation/removal of selected packages") +
   QString("</li><li>") +

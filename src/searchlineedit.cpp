@@ -10,7 +10,6 @@
 #include "strconstants.h"
 #include "wmhelper.h"
 #include "uihelper.h"
-//#include "iostream"
 
 #include <QApplication>
 #include <QToolButton>
@@ -19,7 +18,6 @@
 #include <QCompleter>
 #include <QStringListModel>
 #include <QKeyEvent>
-//#include <QDebug>
 
 SearchLineEdit::SearchLineEdit(QWidget *parent, bool hasSLocate) :
   QLineEdit(parent){
@@ -48,7 +46,8 @@ SearchLineEdit::SearchLineEdit(QWidget *parent, bool hasSLocate) :
   this->m_SearchButton->setStyleSheet(this->buttonStyleSheetForCurrentState());
 
   m_defaultValidator = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9_\\-\\$\\^\\*\\+\\(\\)\\[\\]\\.\\s]+"), this);
-  m_aurValidator = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9_\\-\\s\\+\\$\\^]+"), this);
+  //m_aurValidator = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9_\\-\\s\\+\\$\\^]+"), this);
+  m_aurValidator = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9_\\-\\s\\+]+"), this);
   m_fileValidator = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9_\\-\\/\\.]+"), this);
 
   setValidator(m_defaultValidator);
@@ -156,9 +155,6 @@ QString SearchLineEdit::styleSheetForCurrentState()
   style += "padding-left: 20px;";
   style += QString("padding-right: %1px;").arg(this->m_SearchButton->sizeHint().width() + frameWidth + 1);
   style += "border-width: 3px;}";
-  //style += "border-image: url(:/resources/images/esf-border.png) 3 3 3 3 stretch;";
-  //style += "background-color: rgba(255, 255, 255, 255);"; //204);";
-  //style += "color: black;}";
 
   return style;
 }
@@ -172,23 +168,7 @@ void SearchLineEdit::setFoundStyle(){
   style += "padding-left: 20px;";
   style += QString("padding-right: %1px;").arg(this->m_SearchButton->sizeHint().width() + 2);
   style += "border-width: 3px;}";
-  //style += "border-image: url(:/resources/images/esf-border.png) 3 3 3 3 stretch;";
-  //style += "color: black; ";
-  //style += "background-color: rgb(255, 255, 200);";
-  //style += "border-color: rgb(206, 204, 197);}";
   setStyleSheet(style);
-
-  /*else
-  // setPalette() must be called after setStyleSheet()
-  {
-    style += "padding-left: 20px;}";
-    setStyleSheet(style);
-
-    QPalette palette(QApplication::palette());
-    palette.setColor(QPalette::Base, QColor(255, 255, 200));
-    palette.setColor(QPalette::Text, Qt::darkGray); // give more contrast to text
-    setPalette(palette);
-  }*/
 }
 
 void SearchLineEdit::setNotFoundStyle(){
@@ -199,10 +179,6 @@ void SearchLineEdit::setNotFoundStyle(){
   style += "padding-left: 20px;";
   style += QString("padding-right: %1px;").arg(this->m_SearchButton->sizeHint().width() + 2);
   style += "border-width: 3px;}";
-  //style += "border-image: url(:/resources/images/esf-border.png) 3 3 3 3 stretch;";
-  //style += "color: white; ";
-  //style += "background-color: lightgray;"; //rgb(255, 108, 108); //palette(mid);"; //rgb(207, 135, 142);";
-  //style += "border-color: rgb(206, 204, 197);}";
   setStyleSheet(style);
 }
 
