@@ -264,19 +264,35 @@ QByteArray UnixCommand::getPackageContentsUsingPkg(const QString& pkgName)
 QString UnixCommand::getPackageByFilePath(const QString &filePath)
 {
   QString pkgName="";
-  QString out = performQuery("which -o " + filePath);
+  QStringList sl;
+  sl << "-E";
+  sl << filePath;
 
-  if (!out.isEmpty() && !out.contains("was not found in the database"))
+  QString out = performQuery(sl);
+  if (!out.isEmpty())
   {
-    int pos = out.indexOf("was installed by package");
-    if (pos != -1)
+    int pos = out.indexOf(":");
+    if (pos >= 0)
     {
-      int pos2 = out.indexOf("/", pos+25);
-      pkgName = out.right(out.size()-(pos2+1));
-      pkgName.remove('\n');
+      out = out.mid(pos+2);
+      pos = out.indexOf("\n");
+      QString aux = out.left(pos);
+
+      if (!aux.isEmpty())
+      {
+        int sep;
+        if (Package::isWeirdVersionPkg(aux))
+          sep = aux.indexOf("-");
+        else
+          sep = aux.lastIndexOf("-");
+
+        aux = aux.left(sep);
+        pkgName = aux.trimmed();
+      }
     }
   }
 
+  //std::cout << "Found pkg: " << pkgName.toLatin1().data() << std::endl;
   return pkgName;
 }
 
