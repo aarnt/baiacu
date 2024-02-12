@@ -176,10 +176,6 @@ void MainWindow::deferredInitAppIcon()
 void MainWindow::switchToViewAllPackages()
 {
   m_selectedViewOption = ectn_ALL_PKGS;
-
-  /*disconnect(ui->actionViewAllPackages, SIGNAL(triggered()), this, SLOT(selectedAllPackagesMenu()));
-  ui->actionViewAllPackages->setChecked(true);
-  connect(ui->actionViewAllPackages, SIGNAL(triggered()), this, SLOT(selectedAllPackagesMenu()));*/
 }
 
 /*
@@ -206,7 +202,6 @@ void MainWindow::showAnchorDescription(const QUrl &link)
 {
   if (link.toString().contains("goto:"))
   {
-    //qDebug() << "ENTERED!";
     QString pkgName = link.toString().mid(5);
 
     QFuture<QString> f;
@@ -541,17 +536,8 @@ void MainWindow::tvPackagesSearchColumnChanged(QAction *actionSelected)
   {
     m_leFilterPackage->clear();
     m_packageModel->applyFilter("");
-    //ui->actionViewAllPackages->trigger();
-    //m_actionRepositoryAll->trigger();
-    //ui->menuView->setEnabled(false);
-    //ui->twGroups->setEnabled(false);
     m_leFilterPackage->setRefreshValidator(ectn_FILE_VALIDATOR);
   }
-
-  /*if (!isSearchByFileSelected() && (!isRemoteSearchSelected()) && m_packageModel->getPackageCount() <= 1)
-  {
-    m_leFilterPackage->clear();
-  }*/
 
   if (!isRemoteSearchSelected())
   {
@@ -579,13 +565,6 @@ void MainWindow::tvPackagesSearchColumnChanged(QAction *actionSelected)
  */
 void MainWindow::changePackageListModel(ViewOptions viewOptions, QString selectedRepo)
 {  
-  /*
-  if (m_actionSwitchToAURTool->isChecked())
-    m_packageModel->applyFilter(viewOptions, "", StrConstants::getForeignToolGroup());
-  else
-    m_packageModel->applyFilter(viewOptions, selectedRepo, isAllCategoriesSelected() ? "" : getSelectedCategory());
-  */
-
   m_packageModel->applyFilter(viewOptions, selectedRepo, isAllCategoriesSelected() ? "" : getSelectedCategory());
 
   if (m_leFilterPackage->text() != "") reapplyPackageFilter();
@@ -643,22 +622,14 @@ void MainWindow::execContextMenuPackages(QPoint point)
     {
       const PackageRepository::PackageData*const package = m_packageModel->getData(item);
 
-      if (UnixCommand::getBSDFlavour() == ectn_DRAGONFLYBSD ||
-          UnixCommand::getBSDFlavour() == ectn_FREEBSD ||
-          UnixCommand::getBSDFlavour() == ectn_GHOSTBSD ||
-          UnixCommand::getBSDFlavour() == ectn_HARDENEDBSD)
+      if (package->installed() == false || Package::isForbidden(package->name))
       {
-        if (package->installed() == false || Package::isForbidden(package->name))
-        {
-          allRemovable = false;
-        }
+        allRemovable = false;
       }
     }
 
     if (allInstallable) // implicitly foreign packages == 0
     {
-      //if (!isAllCategoriesSelected() && !isAURGroupSelected()) menu->addAction(ui->actionInstallGroup);
-
       menu->addAction(ui->actionInstall);
 
       if (allRemovable == false && !isAllCategoriesSelected() && !isRemoteSearchSelected()) //&& numberOfSelPkgs > 1)
@@ -714,7 +685,6 @@ void MainWindow::execContextMenuPackages(QPoint point)
         {
           //If we select all packages, let's subtract the remove action...
           menu->removeAction(ui->actionRemove);
-          //menu->addAction(ui->actionRemoveGroup);
         }
       }
     }

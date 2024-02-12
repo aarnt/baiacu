@@ -1182,6 +1182,6 @@ QString Package::parseSearchString(QString searchStr, bool exactMatch)
  */
 bool Package::isForbidden(const QString pkgName)
 {
-  QStringList forbiddenPkgs = { "pkg", "xorg" };
+  QStringList forbiddenPkgs = { "quirks", "xorg" };
   return forbiddenPkgs.contains(pkgName);
 }
