@@ -6,6 +6,7 @@
 It consists of a lxqt-sudo clone called [baiacu-doas](https://github.com/aarnt/baiacu/tree/main/doas) used to gain root privileges and a package browser application used
 to search, install, remove and update packages.
 The project is compatible with [OpenBSD](https://www.openbsd.org/).
+Baiacu is a [Tupi-Guarani](https://en.wikipedia.org/wiki/Tupi%E2%80%93Guarani_languages) word that means "the hot and poisonous thing, because of its gall".
 
 ### Follow the steps bellow to compile the latest source code (you'll need curl, git and qt5 packages):
 
