@@ -348,119 +348,6 @@ bool MainWindow::isPackageInRemoveTransaction(const QString &pkgName)
 }
 
 /*
- * Inserts all optional deps of the current select package into the Transaction Treeview
- */
-/*void MainWindow::insertIntoInstallPackageOptDeps(const QString &packageName)
-{
-  CPUIntensiveComputing *cic = new CPUIntensiveComputing;
-
-  //Does this package have non installed optional dependencies?
-  QStringList optDeps = Package::getOptionalDeps(packageName); //si->text());
-  QList<const PackageRepository::PackageData*> optionalPackages;
-
-  for(QString optDep: optDeps)
-  {
-    QString candidate = optDep;
-    int points = candidate.indexOf(":");
-    candidate = candidate.mid(0, points).trimmed();
-
-    const PackageRepository::PackageData*const package = m_packageRepo.getFirstPackageByName(candidate);
-    if(!isPackageInInstallTransaction(candidate) &&
-       !isPackageInstalled(candidate) && package != 0)
-    {
-      optionalPackages.append(package);
-    }
-  }
-
-  if(optionalPackages.count() > 0)
-  {
-    MultiSelectionDialog *msd = new MultiSelectionDialog(this);
-    msd->setWindowTitle(packageName + ": " + StrConstants::getOptionalDeps());
-    msd->setWindowIcon(windowIcon());
-    QStringList selectedPackages;
-
-    for(const PackageRepository::PackageData* candidate: optionalPackages)
-    {
-      QString desc = candidate->description;
-      int space = desc.indexOf(" ");
-      desc = desc.mid(space+1);
-
-      msd->addPackageItem(candidate->name, candidate->description, candidate->repository);
-    }
-
-    delete cic;
-    if (msd->exec() == QMessageBox::Ok)
-    {
-      selectedPackages = msd->getSelectedPackages();
-      for(QString pkg: selectedPackages)
-      {
-        insertInstallPackageIntoTransaction(pkg);
-      }
-    }
-
-    delete msd;
-  }
-  else
-  {
-    delete cic;
-  }
-}*/
-
-/*
- * Inserts all remove dependencies of the current select package into the Transaction Treeview
- * Returns TRUE if the user click OK or ENTER and number of selected packages > 0.
- * Returns FALSE otherwise.
- */
-/*bool MainWindow::insertIntoRemovePackageDeps(const QStringList &dependencies)
-{
-  QList<const PackageRepository::PackageData*> newDeps;
-  for(QString dep: dependencies)
-  {
-    const PackageRepository::PackageData*const package = m_packageRepo.getFirstPackageByName(dep);
-    if (package != NULL && package->installed() && !isPackageInRemoveTransaction(dep))
-    {
-      newDeps.append(package);
-    }
-  }
-
-  if (newDeps.count() > 0)
-  {
-    CPUIntensiveComputing *cic = new CPUIntensiveComputing;
-
-    MultiSelectionDialog *msd = new MultiSelectionDialog(this);
-    msd->setWindowTitle(StrConstants::getRemovePackages(newDeps.count()));
-    msd->setWindowIcon(windowIcon());
-    QStringList selectedPackages;
-
-    for(const PackageRepository::PackageData* dep: newDeps)
-    {
-      QString desc = dep->description;
-      int space = desc.indexOf(" ");
-      desc = desc.mid(space+1);
-      msd->addPackageItem(dep->name, desc, dep->repository);
-    }
-
-    msd->setAllSelected();
-    delete cic;
-    int res = msd->exec();
-
-    if (res == QMessageBox::Ok)
-    {
-      selectedPackages = msd->getSelectedPackages();
-      for(QString pkg: selectedPackages)
-      {
-        insertRemovePackageIntoTransaction(pkg);
-      }
-    }
-
-    delete msd;
-
-    return (res == QMessageBox::Ok && selectedPackages.count() >= 0);
-  }
-  else return true;
-}*/
-
-/*
  * Inserts the current selected group for removal into the Transaction Treeview
  */
 void MainWindow::insertGroupIntoInstallPackage()
@@ -740,7 +627,7 @@ void MainWindow::doSystemUpgrade()
   QStringList params;
 
   params << ctn_PKG_ADD_BIN;
-  params << "-n";
+  //params << "-n";
   params << "-u";
   params << "-I";
 
@@ -771,8 +658,8 @@ void MainWindow::doRemoveAndInstall()
 
   params << UnixCommand::getShell();
   params << "-c";
-  params << ctn_PKG_DELETE_BIN + " -I -n " + listOfRemoveTargets + "; " +
-      ctn_PKG_ADD_BIN + " -I -n " + listOfInstallTargets;
+  params << ctn_PKG_DELETE_BIN + " -I " + listOfRemoveTargets + "; " +
+      ctn_PKG_ADD_BIN + " -I " + listOfInstallTargets;
 
   m_unixCommand = new UnixCommand(this);
 
@@ -797,7 +684,7 @@ void MainWindow::doRemove()
   QString listOfTargets = getTobeRemovedPackages();  
   QString command;
 
-  command = ctn_PKG_DELETE_BIN + " -I -n " + listOfTargets;
+  command = ctn_PKG_DELETE_BIN + " -I " + listOfTargets;
 
   m_unixCommand = new UnixCommand(this);
 
@@ -919,7 +806,7 @@ void MainWindow::doInstall()
   QString listOfTargets = getTobeInstalledPackages();
   QString command;
 
-  command = ctn_PKG_ADD_BIN + " -I -n " + listOfTargets;
+  command = ctn_PKG_ADD_BIN + " -I " + listOfTargets;
 
   disableTransactionActions();
   m_unixCommand = new UnixCommand(this);
@@ -1869,7 +1756,9 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
               newMsg.contains(QRegularExpression("[Ll]oading")) ||
               newMsg.contains(QRegularExpression("[Rr]esolving")) ||
               newMsg.contains(QRegularExpression("[Ee]xtracting")) ||
-              newMsg.contains(QRegularExpression("Running tag")) ||
+              newMsg.contains(QRegularExpression("Running tags")) ||
+              newMsg.contains(QRegularExpression("Read Shared")) ||
+              newMsg.contains(QRegularExpression("Reading update info")) ||
               newMsg.contains(QRegularExpression("[Ll]ooking")))
       {         
         newMsg = "<b><font color=\"#4BC413\">" + newMsg + "</font></b>"; //GREEN
@@ -1883,6 +1772,7 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
       }
       else if (newMsg.contains(":") &&
                (!newMsg.contains(QRegularExpression("Running tags"))) &&
+               (!newMsg.contains(QRegularExpression("Read Shared"))) &&
                (!newMsg.contains(QRegularExpression("->"))) &&
                (!newMsg.contains(QRegularExpression("Number of packages to be"))) &&
                (!newMsg.contains(QRegularExpression("\\):"))) &&
