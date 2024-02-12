@@ -105,11 +105,11 @@ void MainWindow::remoteSearchClicked()
   else if (m_commandExecuting == ectn_LOCAL_PKG_REFRESH)
     m_refreshPackageLists = true;
 
-  metaBuildPackageList();
   clearTabsInfoOrFilesExt();
+  metaBuildPackageList();
   m_cachedPackageInInfo = "";
   m_cachedPackageInFiles = "";
-  invalidateTabs();
+  //invalidateTabs();
 
   if (m_commandExecuting == ectn_LOCAL_PKG_REFRESH)
   {
@@ -936,7 +936,7 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
   }
 
   //Maybe this is a non-installed package...
-  bool nonInstalled = (package->installed() == false);
+  //bool nonInstalled = (package->installed() == false);
 
   QTreeView*const tvPkgFileList =
       ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
@@ -957,7 +957,7 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
     QEventLoop el;
     QFuture<QStringList> f;
     QFutureWatcher<QStringList> fwPackageContents;
-    f = QtConcurrent::run(Package::getContents, pkgName, !nonInstalled);
+    f = QtConcurrent::run(Package::getContents, pkgName);
     connect(&fwPackageContents, SIGNAL(finished()), &el, SLOT(quit()));
     fwPackageContents.setFuture(f);
 

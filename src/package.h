@@ -157,6 +157,7 @@ class Package{
     static Result verifyPreReleasePackage(const QStringList &versao1,
                                           const QStringList &versao2, const QString &pacote);
 
+    static QString extractFilesFromInfo(const QString &pkgInfo);
     static QString extractFieldFromInfo(const QString &field, const QString &pkgInfo);
     static double simplePow(int base, int exp);
     static void navigateThroughDirs(QStringList parts, QStringList& auxList, int ind);
@@ -180,7 +181,7 @@ class Package{
     static QString getInformationDescription(const QString &pkgName, bool foreignPackage = false);
     static QString getInformationInstalledSize(const QString &pkgName, bool foreignPackage = false);
     static QString getDependencies(const QString &pkgName);
-    static QStringList getContents(const QString &pkgName, bool isInstalled);
+    static QStringList getContents(const QString &pkgName);
     static QStringList getOptionalDeps(const QString &pkgName);
     static QString getName(const QString &pkgInfo);
     static QString getVersion(const QString &pkgInfo);
@@ -202,11 +203,12 @@ class Package{
     static QString getFiles(const QString &pkgInfo);
     static QString getComment(const QString &pkgInfo);
     static QString getInstalledOn(const QString &pkgInfo);
+
     static double getDownloadSize(const QString &pkgInfo);
     static QString getDownloadSizeAsString(const QString &pkgInfo);
     static double getInstalledSize(const QString &pkgInfo);
-    static QString getPackageInstallDate(const QString &pkgNameVersion);
     static QString getInstalledSizeAsString(const QString &pkgInfo);
+    static QString getPackageInstallDate(const QString &pkgNameVersion);
     static QString getOptions(const QString &pkgInfo);
 
     static QString kbytesToSize(float Bytes );

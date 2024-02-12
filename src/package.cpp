@@ -568,7 +568,42 @@ QList<PackageListData> * Package::getRemotePackageList(const QString& searchStri
 }
 
 /*
- * Given a QString containing the output of pacman -Si/Qi (pkgInfo),
+ * Given a QString containing the output of pkg_info pkg (pkgInfo),
+ * this method returns the contents of the Files field
+ */
+QString Package::extractFilesFromInfo(const QString &pkgInfo)
+{
+  int fieldPos = pkgInfo.indexOf("Files");
+  int fieldEnd;
+  QString aux;
+
+  if (fieldPos > 0)
+  {
+    fieldPos = pkgInfo.indexOf(":", fieldPos+1);
+    fieldPos+=2;
+    aux = pkgInfo.mid(fieldPos);
+    std::cout << "AUX: " << aux.toLatin1().data() << std::endl;
+
+    fieldEnd = aux.indexOf("Information for");
+    if (fieldEnd > 0)
+    {
+      fieldEnd--;
+    }
+    else
+    {
+      fieldEnd = pkgInfo.size()-1;
+    }
+
+    aux = aux.left(fieldEnd).trimmed();
+    std::cout << "AUX: " << aux.toLatin1().data() << std::endl;
+  }
+
+  //std::cout << "Files: " << aux.toLatin1().data() << std::endl;
+  return aux;
+}
+
+/*
+ * Given a QString containing the output of pkg_info pkg (pkgInfo),
  * this method returns the contents of the given field (ex: description)
  */
 QString Package::extractFieldFromInfo(const QString &field, const QString &pkgInfo)
@@ -583,9 +618,7 @@ QString Package::extractFieldFromInfo(const QString &field, const QString &pkgIn
     fieldPos+=2;
     aux = pkgInfo.mid(fieldPos);
 
-    if (field == "Files")
-      fieldEnd = pkgInfo.size();
-    else if (field == "Description")
+    if (field == "Description")
     {
       fieldEnd = aux.indexOf("Maintainer:") -1;
     }
@@ -1028,17 +1061,14 @@ QString Package::getInformationInstalledSize(const QString &pkgName, bool foreig
 /*
  * Retrieves the file list content of the given package
  */
-QStringList Package::getContents(const QString& pkgName, bool isInstalled)
+QStringList Package::getContents(const QString& pkgName)
 {
-  Q_UNUSED(isInstalled)
-
   QString result;
   QStringList sl;
   sl << "-L";
   sl << pkgName;
 
-  result = Package::getFiles(UnixCommand::performQuery(sl));
-
+  result = Package::extractFilesFromInfo(UnixCommand::performQuery(sl));
   QString aux(result);
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
