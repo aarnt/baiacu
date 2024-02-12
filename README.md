@@ -1,39 +1,33 @@
-## This is OctoPkg, a powerful pkgng front end using Qt libs.
+## This is Baiacu, a powerful OpenBSD pkg front end using Qt libs.
 
-![Main window](https://raw.githubusercontent.com/aarnt/octopkg/master/octopkg-mainwindow.png)
+![Main window](https://raw.githubusercontent.com/aarnt/baiacu/main/baiacu-mainwindow.png)
 
-**OctoPkg** is a Qt based GUI front end to the [pkg](https://wiki.freebsd.org/pkg) package manager, derived from [Octopi](http://tintaescura.com/projects/octopi).
-It consists of a lxqt-sudo clone called [octopkg-doas](https://github.com/aarnt/octopkg/tree/master/doas) used to gain root privileges and a package browser application used
+**Baiacu** is a Qt based GUI front end to the OpenBSD package manager, derived from [Octopkg](http://tintaescura.com/projects/octopkg).
+It consists of a lxqt-sudo clone called [baiacu-doas](https://github.com/aarnt/baiacu/tree/main/doas) used to gain root privileges and a package browser application used
 to search, install, remove and update packages.
-The project is compatible with [FreeBSD](https://www.freebsd.org/), [DragonFly BSD](https://www.dragonflybsd.org/), [GhostBSD](https://ghostbsd.org/) and [HardenedBSD](https://hardenedbsd.org/).
-
-### You can use pkg to install the latest OctoPkg version available in your BSD:
-
-```
-# pkg install octopkg
-```
+The project is compatible with [OpenBSD](https://www.openbsd.org/).
 
 ### Follow the steps bellow to compile the latest source code (you'll need curl, git and qt5 packages):
 
 ```
-$ git clone https://github.com/aarnt/octopkg
-$ cd octopkg/doas
-$ /usr/local/lib/qt5/bin/qmake
+$ git clone https://github.com/aarnt/baiacu
+$ cd baiacu/doas
+$ qmake-qt5
 $ make
 # make install
 $ cd ..
-$ /usr/local/lib/qt5/bin/qmake
+$ qmake-qt5
 $ make
 # make install
 ```
 
-### In order to run OctoPkg:
+### In order to run Baiacu:
 
 ```
-$ octopkg
+$ baiacu
 ```
 
-Remember: OctoPkg needs doas or sudo tool to work.
+Remember: Baiacu needs doas or sudo tool to work.
 
 
 Enjoy!
