@@ -361,14 +361,7 @@ void MainWindow::metaBuildPackageList()
     //connect(m_leFilterPackage, SIGNAL(textChanged(QString)), this, SLOT(reapplyPackageFilter()));
     disconnect(&g_fwPkg, SIGNAL(finished()), this, SLOT(preBuildPackageList()));
 
-    if (m_refreshPackageLists)
-    {
-
-    }
-    else
-    {
-      searchForPkgPackages();
-    }
+    searchForPkgPackages();
 
     if(m_debugInfo)
       std::cout << m_packageModel->getPackageCount() << " pkgs => " <<
