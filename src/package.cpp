@@ -582,9 +582,8 @@ QString Package::extractFilesFromInfo(const QString &pkgInfo)
     fieldPos = pkgInfo.indexOf(":", fieldPos+1);
     fieldPos+=2;
     aux = pkgInfo.mid(fieldPos);
-    std::cout << "AUX: " << aux.toLatin1().data() << std::endl;
-
     fieldEnd = aux.indexOf("Information for");
+
     if (fieldEnd > 0)
     {
       fieldEnd--;
@@ -595,7 +594,6 @@ QString Package::extractFilesFromInfo(const QString &pkgInfo)
     }
 
     aux = aux.left(fieldEnd).trimmed();
-    std::cout << "AUX: " << aux.toLatin1().data() << std::endl;
   }
 
   //std::cout << "Files: " << aux.toLatin1().data() << std::endl;
