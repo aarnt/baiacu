@@ -458,8 +458,6 @@ void MainWindow::buildRemotePackageList()
   const QSet<QString>*const unrequiredPackageList = Package::getUnrequiredPackageList();
   QList<PackageListData> *list = m_listOfRemotePackages;
 
-  //std::cout << "FOUND LIST: " << list->count() << std::endl;
-
   m_progressWidget->setRange(0, list->count());
   m_progressWidget->setValue(0);
   int counter=0;
@@ -529,9 +527,6 @@ void MainWindow::buildRemotePackageList()
   //Refresh statusbar widget
   refreshStatusBar();
 
-  //Refresh application icon
-  //refreshAppIcon();
-
   counter = list->count();
   m_progressWidget->setValue(counter);
   m_progressWidget->close();
@@ -539,24 +534,6 @@ void MainWindow::buildRemotePackageList()
   //ui->tvPackages->setColumnHidden(PackageModel::ctn_PACKAGE_REPOSITORY_COLUMN, true);
 
   refreshToolBar();
-  //refreshStatusBarToolButtons();
-
-  //If we found no packages, let's make another search, this time 'by name'...
-  /*if (!m_leFilterPackage->text().isEmpty() &&
-      (!m_leFilterPackage->text().contains(QRegularExpression("\\s"))) &&
-      m_packageModel->getPackageCount() == 0 &&
-      ui->actionSearchByDescription->isChecked())
-  {
-    if (m_cic != NULL)
-    {
-      delete m_cic;
-      m_cic = 0;
-    }
-
-    ui->actionSearchByName->setChecked(true);
-    metaBuildPackageList();
-  }*/
-
   emit buildPackageListDone();
 }
 
