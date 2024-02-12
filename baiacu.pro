@@ -91,6 +91,6 @@ desktop.path = $$DATADIR/applications
 desktop.files += baiacu.desktop
 
 icon.path = $$DATADIR/icons
-icon.files += resources/images/octopi.png
+icon.files += resources/images/baiacu.png
 
 INSTALLS += target bin desktop icon
