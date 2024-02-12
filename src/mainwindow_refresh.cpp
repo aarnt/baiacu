@@ -231,8 +231,6 @@ void MainWindow::buildPackagesFromGroupList(const QString group)
   ui->tvPackages->setFocus();
 
   refreshToolBar();
-  //refreshStatusBarToolButtons();
-
   tvPackagesSelectionChanged(QItemSelection(),QItemSelection());
 }
 
@@ -578,39 +576,10 @@ void MainWindow::buildPackageList()
               this, SLOT(invalidateTabs()));
 
   CPUIntensiveComputing cic;
-  /*static QStandardItemModel emptyModel;
-  if (!m_initializationCompleted)
-  {
-    ui->tvPackages->setModel(&emptyModel);
-    removePackageTreeViewConnections();
-  }*/
-
   static bool firstTime = true;
 
   if(m_refreshPackageLists) //If it's not the starting of the app...
   {
-    //Let's get outdatedPackages list again!
-    /*m_outdatedStringList->clear();
-    m_outdatedList = g_fwOutdatedList.result(); //Package::getOutdatedStringList();
-
-    if(m_debugInfo)
-      std::cout << "Time elapsed retrieving outdated pkgs from 'ALL group' list: " << m_time->elapsed() << " mili seconds." << std::endl;
-
-    for(QString k: m_outdatedList->keys())
-    {
-      m_outdatedStringList->append(k);
-    }
-
-    if(m_debugInfo)
-      std::cout << "Time elapsed refreshing outdated pkgs from 'ALL group' list: " << m_time->elapsed() << " mili seconds." << std::endl;
-
-    m_numberOfOutdatedPackages = m_outdatedStringList->count();
-
-    delete m_lockedPackageList;
-    m_lockedPackageList = NULL;
-    m_lockedPackageList = Package::getLockedPackageList();
-    */
-
     delete m_unrequiredPackageList;
     m_unrequiredPackageList = NULL;
     m_unrequiredPackageList = Package::getUnrequiredPackageList();
@@ -665,32 +634,6 @@ void MainWindow::buildPackageList()
   delete list;
   list = NULL;
 
-  /*if (g_fwLockedPkg.isFinished())
-  {
-    for(QString locked: *m_lockedPackageList)
-    {
-      PackageRepository::PackageData* package = m_packageRepo.getFirstPackageByNameEx(locked);
-      if (package != NULL)
-      {
-        package->status = ectn_LOCKED;
-      }
-    }
-  }
-
-  if(!firstTime && g_fwOutdatedList.isFinished())
-  {
-    for(QString k: m_outdatedList->keys())
-    {
-      OutdatedPackageInfo opi = m_outdatedList->value(k);
-      PackageRepository::PackageData* package = m_packageRepo.getFirstPackageByNameEx(k);
-      if (package != NULL)
-      {
-        package->status = ectn_OUTDATED;
-        package->outdatedVersion = opi.oldVersion;
-      }
-    }
-  }*/
-
   if (isAllCategoriesSelected()) m_packageModel->applyFilter(m_selectedViewOption, m_selectedRepository, "");
 
   reapplyPackageFilter();
@@ -713,44 +656,20 @@ void MainWindow::buildPackageList()
   //Refresh statusbar widget
   refreshStatusBar();
 
-  //Refresh application icon
-  //refreshAppIcon();
-
   if (firstTime)
   {
-    //getOutdatedPackageListThreaded();
-
     if (isPackageTreeViewVisible())
     {
       m_leFilterPackage->setFocus();
     }
 
-    //m_initializationCompleted = true;
+    m_initializationCompleted = true;
     firstTime = false;
 
-    /*if (m_callSystemUpgrade)
-    {
-      //First, let us throw away that 'wainting cursor'...
-      QApplication::restoreOverrideCursor();
-      doSystemUpgrade();
-    }
-    else if (m_callSystemUpgradeNoConfirm)
-    {
-      //First, let us throw away that 'wainting cursor'...
-      QApplication::restoreOverrideCursor();
-      doSystemUpgrade(ectn_NOCONFIRM_OPT);
-    }
-    else if (m_packagesToInstallList.count() > 0)
-    {
-      //First, let us throw away that 'wainting cursor'...
-      QApplication::restoreOverrideCursor();
-      doInstallLocalPackages();
-    }*/
   } //end of firstTime
 
   //ui->tvPackages->setColumnWidth(PackageModel::ctn_PACKAGE_SIZE_COLUMN, 10);
   refreshToolBar();
-  //refreshStatusBarToolButtons();
   m_refreshPackageLists = true;  
 
   emit buildPackageListDone();
@@ -784,34 +703,6 @@ void MainWindow::horizontalSplitterMoved(int pos, int index)
  */
 void MainWindow::refreshToolBar()
 {
-  /*m_hasAURTool =
-      UnixCommand::hasTheExecutable(StrConstants::getForeignRepositoryToolName()) && !UnixCommand::isRootRunning();
-
-  if (m_hasAURTool)
-  {
-    if (!ui->mainToolBar->actions().contains(m_actionSwitchToPkgSearch))
-    {
-      ui->mainToolBar->insertAction(m_dummyAction, m_actionSwitchToPkgSearch);
-      m_separatorForActionPkgSearch = ui->mainToolBar->insertSeparator(m_actionSwitchToPkgSearch);
-    }
-  }
-  else
-  {
-    if (ui->mainToolBar->actions().contains(m_actionSwitchToPkgSearch))
-    {
-      bool wasChecked = (m_actionSwitchToPkgSearch->isChecked());
-
-      ui->mainToolBar->removeAction(m_actionSwitchToPkgSearch);
-      ui->mainToolBar->removeAction(m_separatorForActionPkgSearch);
-
-      if (wasChecked)
-      {
-        m_actionSwitchToPkgSearch->setChecked(false);
-        ui->twGroups->setEnabled(true);
-        groupItemSelected();
-      }
-    }
-  }*/
 }
 
 /*
