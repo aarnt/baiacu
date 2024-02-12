@@ -29,7 +29,7 @@ $ make
 $ baiacu
 ```
 
-Remember: Baiacu needs doas or sudo tool to work.
+Remember: Baiacu needs doas/sudo and curl to work.
 
 
 Enjoy!
