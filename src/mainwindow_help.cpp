@@ -1,6 +1,6 @@
 /*
-* This file is part of OctoPkg, an open-source GUI for pkgng.
-* Copyright (C) 2015  Alexandre Albuquerque Arnt
+* This file is part of Baiacu, an open-source GUI for OpenBSD pkg.
+* Copyright (C) 2024 Alexandre Albuquerque Arnt
 *               2013  Manuel Tortosa
 *
 * This program is free software; you can redistribute it and/or modify
