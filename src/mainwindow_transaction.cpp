@@ -730,10 +730,8 @@ void MainWindow::stopTransaction()
 /*
  * Does a system upgrade with "pkg_add u" !
  */
-void MainWindow::doSystemUpgrade() //SystemUpgradeOptions systemUpgradeOptions)
+void MainWindow::doSystemUpgrade()
 {
-  //Q_UNUSED(systemUpgradeOptions)
-
   if (!isSUAvailable()) return;
 
   prepareSystemUpgrade();
@@ -748,125 +746,6 @@ void MainWindow::doSystemUpgrade() //SystemUpgradeOptions systemUpgradeOptions)
 
   m_unixCommand->executeCommand(params);
   m_commandQueued = ectn_NONE;
-
-  /*if (m_systemUpgradeDialog) return;
-
-  if(m_callSystemUpgrade && m_numberOfOutdatedPackages == 0)
-  {
-    m_callSystemUpgrade = false;
-    return;
-  }
-  else if (m_callSystemUpgradeNoConfirm && m_numberOfOutdatedPackages == 0)
-  {
-    m_callSystemUpgrade = false;
-    return;
-  }
-
-  if (!isSUAvailable()) return;
-
-  //Shows a dialog indicating the targets needed to be retrieved and asks for the user's permission.
-  //TransactionInfo ti = g_fwTargetUpgradeList.result(); //Package::getTargetUpgradeList();
-  QStringList *targets = ti.packages;
-
-  //There are no new updates to install!
-  if (targets->count() == 0 && m_outdatedStringList->count() == 0)
-  {
-    clearTabOutput();
-    writeToTabOutputExt(QLatin1String("<b>") + StrConstants::getNoNewUpdatesAvailable() + QLatin1String("</b>"));
-    return;
-  }
-  else if (targets->count() == 0 && m_outdatedStringList->count() > 0)
-  {
-    //This is a bug and should be shown to the user!
-    clearTabOutput();
-    //writeToTabOutputExt(UnixCommand::getTargetUpgradeList());
-    QString out = UnixCommand::getTargetUpgradeList();
-    splitOutputStrings(out);
-    return;
-  }
-
-  QString list;
-
-  for(QString target: *targets)
-  {
-    list = list + target + "\n";
-  }
-
-  //User already confirmed all updates in the notifier window!
-  if (systemUpgradeOptions == ectn_NOCONFIRM_OPT)
-  {
-    prepareSystemUpgrade();
-
-    m_commandExecuting = ectn_SYSTEM_UPGRADE;
-
-    QString command;
-    command = ctn_PKG_BIN + QLatin1String(" upgrade -y");
-
-    m_unixCommand->executeCommand(command);
-    m_commandQueued = ectn_NONE;
-  }
-  else
-  {
-    //Let's build the system upgrade transaction dialog...
-
-    QString ds = ti.sizeToDownload;
-
-    TransactionDialog question(this);
-
-    if(targets->count()==1)
-      question.setText(StrConstants::getRetrievePackage() +
-                       QLatin1String("\n\n") + StrConstants::getTotalDownloadSize().arg(ds).remove(QLatin1String(" KB")));
-    else
-      question.setText(StrConstants::getRetrievePackages(targets->count()) +
-                       QLatin1String("\n\n") + StrConstants::getTotalDownloadSize().arg(ds).remove(QLatin1String(" KB")));
-
-    question.setWindowTitle(StrConstants::getConfirmation());
-    question.setInformativeText(StrConstants::getConfirmationQuestion());
-    question.setDetailedText(list);
-
-    m_systemUpgradeDialog = true;
-    int result = question.exec();
-
-    if(result == QDialogButtonBox::Yes || result == QDialogButtonBox::AcceptRole)
-    {
-      prepareSystemUpgrade();
-
-      if (result == QDialogButtonBox::Yes)
-      {
-        m_commandExecuting = ectn_SYSTEM_UPGRADE;
-        QStringList params;
-
-        if (question.isBootEnvChecked())
-        {
-          QString beName = QDateTime::currentDateTime().toString(QLatin1String("yyMMdd-hhmmss"));
-          params << UnixCommand::getShell();
-          params << "-c";
-          params << "bectl create " + beName + "; " + ctn_PKG_BIN + " upgrade -y";
-        }
-        else
-        {
-          params << ctn_PKG_BIN;
-          params << "upgrade";
-          params << "-y";
-        }
-
-        m_unixCommand->executeCommand(params);
-        m_commandQueued = ectn_NONE;
-      }
-      else if (result == QDialogButtonBox::AcceptRole)
-      {
-        m_commandExecuting = ectn_RUN_SYSTEM_UPGRADE_IN_TERMINAL;
-        m_unixCommand->runCommandInTerminal(m_lastCommandList);
-        m_commandQueued = ectn_NONE;
-      }
-    }
-    else if (result == QDialogButtonBox::No)
-    {
-      m_systemUpgradeDialog = false;
-      enableTransactionActions();
-      toggleSystemActions(true);
-    }
-  }*/
 }
 
 /*
@@ -884,122 +763,30 @@ void MainWindow::doPreRemoveAndInstall()
 void MainWindow::doRemoveAndInstall()
 {
   QString listOfRemoveTargets = getTobeRemovedPackages();
-  QString removeList;
-  QString allLists;
-  TransactionDialog question(this);
-  QString dialogText;
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-  QStringList removeTargets = listOfRemoveTargets.split(" ", QString::SkipEmptyParts);
-#else
-  QStringList removeTargets = listOfRemoveTargets.split(" ", Qt::SkipEmptyParts);
-#endif 
-  
-  for(QString target: removeTargets)
-  {
-    removeList = removeList + StrConstants::getRemove() + " "  + target + "\n";
-  }
-
   QString listOfInstallTargets = getTobeInstalledPackages();
-  TransactionInfo ti = g_fwTargetUpgradeList.result();
-  QStringList *installTargets = ti.packages;
-  QString ds = ti.sizeToDownload;
 
-  if (ti.sizeToDownload == "0") ds = "0.00 Bytes";
+  disableTransactionButtons();
 
-  QString installList;
+  QStringList params;
 
-  for(QString target: *installTargets)
-  {
-    installList = installList + StrConstants::getInstall() + " " + target + "\n";
-  }
+  params << UnixCommand::getShell();
+  params << "-c";
+  params << ctn_PKG_DELETE_BIN + " -I -n " + listOfRemoveTargets + "; " +
+      ctn_PKG_ADD_BIN + " -I -n " + listOfInstallTargets;
 
-  allLists.append(removeList);
-  allLists.append(installList);
+  m_unixCommand = new UnixCommand(this);
 
-  if (removeTargets.count() == 1)
-  {
-    dialogText = StrConstants::getRemovePackage() + "\n";
-  }
-  else if (removeTargets.count() > 1)
-  {
-    dialogText = StrConstants::getRemovePackages(removeTargets.count()) + "\n";
-  }
-  if (installTargets->count() == 1)
-  {
-    dialogText += StrConstants::getRetrievePackage() +
-      "\n\n" + StrConstants::getTotalDownloadSize().arg(ds).remove(" KB");
-  }
-  else if (installTargets->count() > 1)
-  {
-    dialogText += StrConstants::getRetrievePackages(installTargets->count()) +
-      "\n\n" + StrConstants::getTotalDownloadSize().arg(ds).remove(" KB");
-  }
+  QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
+                   this, &MainWindow::actionsProcessReadOutput);
+  QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
+                   this, &MainWindow::actionsProcessFinished);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
+                   this, &MainWindow::actionsProcessRaisedError);
 
-  question.setText(dialogText);
-  question.setWindowTitle(StrConstants::getConfirmation());
-  question.setInformativeText(StrConstants::getConfirmationQuestion());
-  question.setDetailedText(allLists);
-  question.uncheckBootEnv();
-  int result = question.exec();
-
-  if(result == QDialogButtonBox::Yes || result == QDialogButtonBox::AcceptRole)
-  {
-    disableTransactionButtons();
-
-    QStringList params;
-
-    if (question.isBootEnvChecked())
-    {
-      QString beName = QDateTime::currentDateTime().toString(QLatin1String("yyMMdd-hhmmss"));
-      params << UnixCommand::getShell();
-      params << "-c";
-      params << "bectl create " + beName + "; " +
-        ctn_PKG_BIN + " remove -y " + listOfRemoveTargets + "; " +
-        ctn_PKG_BIN + " install -f -y " + listOfInstallTargets;
-    }
-    else
-    {
-      params << UnixCommand::getShell();
-      params << "-c";
-      params << ctn_PKG_BIN + " remove -y " + listOfRemoveTargets + "; " +
-        ctn_PKG_BIN + " install -f -y " + listOfInstallTargets;
-    }
-
-    m_lastCommandList.clear();
-    m_lastCommandList.append(ctn_PKG_BIN + " remove " + listOfRemoveTargets + ";");
-    m_lastCommandList.append(ctn_PKG_BIN + " install -f " + listOfInstallTargets + ";");
-    m_lastCommandList.append("echo -e;");
-    m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");
-
-    m_unixCommand = new UnixCommand(this);
-
-    QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
-                     this, &MainWindow::actionsProcessReadOutput);
-    QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
-                     this, &MainWindow::actionsProcessFinished);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
-                     this, &MainWindow::actionsProcessRaisedError);
-
-    disableTransactionActions();
-
-    if (result == QDialogButtonBox::Yes)
-    {
-      m_commandExecuting = ectn_REMOVE_INSTALL;
-      m_unixCommand->executeCommand(params);
-    }
-    else if (result == QDialogButtonBox::AcceptRole)
-    {
-      m_commandExecuting = ectn_RUN_IN_TERMINAL;
-      m_unixCommand->runCommandInTerminal(m_lastCommandList);
-    }
-  }
-  else
-  {
-    m_commandExecuting = ectn_NONE;
-    enableTransactionActions();
-  }
+  disableTransactionActions();
+  m_commandExecuting = ectn_REMOVE_INSTALL;
+  m_unixCommand->executeCommand(params);
 }
 
 /*
@@ -1008,7 +795,26 @@ void MainWindow::doRemoveAndInstall()
 void MainWindow::doRemove()
 {
   QString listOfTargets = getTobeRemovedPackages();  
-  QStringList *_targets = Package::getTargetRemovalList(listOfTargets);
+  QString command;
+
+  command = ctn_PKG_DELETE_BIN + " -I -n " + listOfTargets;
+
+  m_unixCommand = new UnixCommand(this);
+
+  QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
+                   this, &MainWindow::actionsProcessReadOutput);
+  QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
+                   this, &MainWindow::actionsProcessFinished);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
+                   this, &MainWindow::actionsProcessRaisedError);
+
+  disableTransactionActions();
+
+  m_commandExecuting = ectn_REMOVE;
+  m_unixCommand->executeCommand(command);
+
+  /*QStringList *_targets = Package::getTargetRemovalList(listOfTargets);
   listOfTargets = "";
   QString list;
 
@@ -1091,7 +897,7 @@ void MainWindow::doRemove()
   {
     m_commandExecuting = ectn_NONE;
     enableTransactionActions();
-  }
+  }*/
 }
 
 /*
@@ -1108,7 +914,28 @@ void MainWindow::doPreInstall()
  */
 void MainWindow::doInstall()
 {
+  disableTransactionButtons();
+
   QString listOfTargets = getTobeInstalledPackages();
+  QString command;
+
+  command = ctn_PKG_ADD_BIN + " -I -n " + listOfTargets;
+
+  disableTransactionActions();
+  m_unixCommand = new UnixCommand(this);
+
+  QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
+  QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
+                   this, &MainWindow::actionsProcessFinished);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
+                   this, &MainWindow::actionsProcessReadOutput);
+  QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
+                   this, &MainWindow::actionsProcessRaisedError);
+
+  m_commandExecuting = ectn_INSTALL;
+  m_unixCommand->executeCommand(command);
+
+  /*QString listOfTargets = getTobeInstalledPackages();
 
   TransactionInfo ti = g_fwTargetUpgradeList.result(); //Package::getTargetUpgradeList(listOfTargets);
   QStringList *targets = ti.packages;
@@ -1201,7 +1028,7 @@ void MainWindow::doInstall()
   {
     m_commandExecuting = ectn_NONE;
     enableTransactionActions();
-  }
+  }*/
 }
 
 /*
@@ -1512,7 +1339,7 @@ void MainWindow::actionsProcessStarted()
  */
 void MainWindow::actionsProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-  m_toolButtonStopTransaction->setVisible(false);
+  //m_toolButtonStopTransaction->setVisible(false);
 
   //bool bRefreshGroups = true;
   m_progressWidget->close();
@@ -1555,7 +1382,6 @@ void MainWindow::actionsProcessFinished(int exitCode, QProcess::ExitStatus exitS
         //Retrieves the RSS News from respective Distro site...
         if (isRemoteSearchSelected())
         {
-          //bRefreshGroups = false;
           m_leFilterPackage->clear();
           //m_actionSwitchToRemoteSearch->setChecked(false);
           //m_actionSwitchToLocalSearch->setChecked(true);
@@ -1705,8 +1531,8 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
     if (!m_progressWidget->isVisible())
     {
       m_progressWidget->show();
-      if (m_commandExecuting != ectn_CHECK_UPDATES)
-        m_toolButtonStopTransaction->setVisible(true);
+      //if (m_commandExecuting != ectn_CHECK_UPDATES)
+        //m_toolButtonStopTransaction->setVisible(true);
     }
 
     m_progressWidget->setValue(100);
@@ -1727,7 +1553,7 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
     QRegularExpression regex;
     QRegularExpressionMatch match;
 
-    if (msg.contains("Fetching") && !msg.contains(QRegularExpression("B/s")))
+    /*if (msg.contains("Fetching") && !msg.contains(QRegularExpression("B/s")))
     {
       int p = msg.indexOf(":");
       if (p == -1) return; //Guard!
@@ -1746,7 +1572,9 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
         if (!msg.contains("["))
           writeToTabOutputExt("<b><font color=\"#FF8040\">Fetching " + target + "</font></b>");
         else
+        {
           writeToTabOutputExt("<b><font color=\"#B4AB58\">Fetching " + target + "</font></b>");
+        }
       }
     }
     else if (msg.contains("Processing"))
@@ -1759,8 +1587,8 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
       if(!textInTabOutput(target))
         writeToTabOutputExt("Processing " + target + "...");
         //writeToTabOutputExt("<b><font color=\"#4BC413\">Processing " + target + "</font></b>"); //GREEN
-    }
-    else if (msg.contains("Extracting") && perc == "100%")
+    }*/
+    if (msg.contains("Extracting") && perc == "100%") //else...
     {
       writeToTabOutputExt(msg);
     }
@@ -1772,8 +1600,8 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
       if (!m_progressWidget->isVisible()){
         m_progressWidget->show();
 
-        if (m_commandExecuting != ectn_CHECK_UPDATES)
-            m_toolButtonStopTransaction->setVisible(true);
+        //if (m_commandExecuting != ectn_CHECK_UPDATES)
+            //m_toolButtonStopTransaction->setVisible(true);
       }
 
       m_progressWidget->setValue(percentage);
@@ -1846,7 +1674,7 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
 
         if (altMsg.startsWith("quirks"))
         {
-          writeToTabOutputExt("<b><font color=\"#FF8040\">" + altMsg + "</font></b>");
+          writeToTabOutputExt("<b><font color=\"#B4AB58\">" + altMsg + "</font></b>");
         }
         else
           writeToTabOutputExt(altMsg); //BLACK
@@ -2014,7 +1842,8 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
     }
     else
     {
-      if(newMsg.contains(QRegularExpression("REMOVED")) ||
+      if(newMsg.contains(QRegularExpression("Ambiguous:")) ||
+         newMsg.contains(QRegularExpression("REMOVED")) ||
          newMsg.contains(QRegularExpression("removing ")) ||
          newMsg.contains(QRegularExpression("could not ")) ||
          newMsg.contains(QRegularExpression("error:")) ||
@@ -2040,9 +1869,10 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
               newMsg.contains(QRegularExpression("[Ll]oading")) ||
               newMsg.contains(QRegularExpression("[Rr]esolving")) ||
               newMsg.contains(QRegularExpression("[Ee]xtracting")) ||
+              newMsg.contains(QRegularExpression("Running tag")) ||
               newMsg.contains(QRegularExpression("[Ll]ooking")))
-      {
-         newMsg = "<b><font color=\"#4BC413\">" + newMsg + "</font></b>"; //GREEN
+      {         
+        newMsg = "<b><font color=\"#4BC413\">" + newMsg + "</font></b>"; //GREEN
       }
       else if (newMsg.contains("-") &&
                (!newMsg.contains(QRegularExpression("->"))) &&
@@ -2052,12 +1882,16 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
         newMsg = "<b><font color=\"#B4AB58\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
       }
       else if (newMsg.contains(":") &&
+               (!newMsg.contains(QRegularExpression("Running tags"))) &&
                (!newMsg.contains(QRegularExpression("->"))) &&
                (!newMsg.contains(QRegularExpression("Number of packages to be"))) &&
                (!newMsg.contains(QRegularExpression("\\):"))) &&
                (!newMsg.contains(QRegularExpression(":$"))))
       {
-        newMsg = "<b><font color=\"#B4AB58\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
+        if (m_commandExecuting == ectn_REMOVE)
+          newMsg = "<b><font color=\"#E55451\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
+        else
+          newMsg = "<b><font color=\"#B4AB58\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
       }
     }
 
