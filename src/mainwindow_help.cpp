@@ -56,7 +56,7 @@ void MainWindow::initTabHelpUsage()
   QString strForMoreInfo = tr("For more information, visit:");
   QString html =
     QString("<h2>Baiacu</h2>") +
-    QString("<h3><p>") + tr("A Qt5-based pkg front-end,") + " " +
+    QString("<h3><p>") + tr("A Qt based OpenBSD pkg front-end,") + " " +
     tr("licensed under the terms of") + " ";
 
   html +=
@@ -200,11 +200,6 @@ void MainWindow::onHelpAbout()
   aboutText += StrConstants::getLicenses() + QLatin1String(": ") +
       QStringLiteral("<a href=\"http://www.gnu.org/licenses/gpl-2.0.html\">GPL v2</a><br><br>");
   aboutText += QStringLiteral("&copy; Alexandre Albuquerque Arnt<br><br>");
-  /*aboutText += QStringLiteral("<b>pkgng</b><br>");
-  aboutText += StrConstants::getVersion() + QLatin1String(": ") + UnixCommand::getPkgNGVersion() + QStringLiteral("<br>");
-  aboutText += StrConstants::getURL() + QLatin1String(": ") +
-    QStringLiteral("<a href=\"https://wiki.freebsd.org/pkg/\">https://wiki.freebsd.org/pkg</a><br>");
-  aboutText += QStringLiteral("&copy; FreeBSD");*/
 
   QMessageBox::about(this, StrConstants::getHelpAbout(), aboutText);
 }
