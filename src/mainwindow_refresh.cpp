@@ -48,21 +48,6 @@
  */
 void MainWindow::refreshAppIcon()
 {
-  /*bool enableSystemUpgrade=false;
-
-  if ((m_outdatedStringList->count() > 0))
-  {
-    setWindowIcon(IconHelper::getIconOctopiRed());
-
-    if(!isThereAPendingTransaction())
-      enableSystemUpgrade=true;
-  }
-  else
-  {
-    setWindowIcon(IconHelper::getIconOctopiGreen());
-  }
-
-  ui->actionSystemUpgrade->setEnabled(enableSystemUpgrade);*/
 }
 
 /*
@@ -70,7 +55,6 @@ void MainWindow::refreshAppIcon()
  */
 void MainWindow::refreshGroupsWidget()
 {
-  //NOP
 }
 
 /*
@@ -421,10 +405,7 @@ void MainWindow::preBuildRemotePackageListMeta()
     m_cic = 0;
   }
 
-  //if (m_packageModel->getPackageCount() == 0)
-  {
-    m_leFilterPackage->setFocus();
-  }
+  m_leFilterPackage->setFocus();
 }
 
 /*
@@ -1230,7 +1211,6 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
 
       counter++;
       m_progressWidget->setValue(counter);
-      //qApp->processEvents();
     }
 
     m_progressWidget->close();

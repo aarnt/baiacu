@@ -1,6 +1,6 @@
 /*
-* This file is part of OctoPkg, an open-source GUI for pkgng.
-* Copyright (C) 2015 Alexandre Albuquerque Arnt
+* This file is part of Baiacu, an open-source GUI for OpenBSD pkg.
+* Copyright (C) 2024 Alexandre Albuquerque Arnt
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -47,10 +47,6 @@ const QString ctn_AUTOMATIC("automatic");
 const QString ctn_KEY_LAST_SYNC_DB_TIME("LastSyncDbTime");
 const QString ctn_KEY_SYNC_DB_INTERVAL("SyncDbInterval");
 const QString ctn_KEY_SYNC_DB_HOUR("SyncDbHour");
-
-//CacheCleaner related
-const QString ctn_KEEP_NUM_INSTALLED("Keep_Num_Installed");
-const QString ctn_KEEP_NUM_UNINSTALLED("Keep_Num_Uninstalled");
 
 enum SaveSettingsReason { ectn_PACKAGELIST, ectn_CURRENTTABINDEX, ectn_NORMAL=30,
                           ectn_MAXIMIZE_PACKAGES=40, ectn_MAXIMIZE_PROPERTIES=50, ectn_GROUPS=5 };

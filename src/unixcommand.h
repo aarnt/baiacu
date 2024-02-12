@@ -1,6 +1,6 @@
 /*
-* This file is part of OctoPkg, an open-source GUI for pkgng.
-* Copyright (C) 2015 Alexandre Albuquerque Arnt
+* This file is part of Baiacu, an open-source GUI for OpenBSD pkg.
+* Copyright (C) 2024 Alexandre Albuquerque Arnt
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 
 #include "package.h"
 #include "utils.h"
-
-const QString ctn_MIRROR_CHECK_APP("mirror-check");
 
 enum CommandExecuting { ectn_NONE, ectn_CLEAN_CACHE, ectn_MIRROR_CHECK,
                         ectn_CHECK_UPDATES, ectn_SYSTEM_UPGRADE, ectn_INSTALL,
@@ -61,7 +59,6 @@ private:
 
 public:
   UnixCommand(QObject *parent);
-
   inline QProcess * getProcess(){ return m_process; }
 
   //Returns the BSD Flavour where OctoPkg is running on

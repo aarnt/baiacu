@@ -1,6 +1,6 @@
 /*
-* This file is part of OctoPkg, an open-source GUI for pkgng.
-* Copyright (C) 2015 Alexandre Albuquerque Arnt
+* This file is part of Baiacu, an open-source GUI for OpenBSD pkg.
+* Copyright (C) 2024 Alexandre Albuquerque Arnt
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 */
 
 #include "unixcommand.h"
-//#include "strconstants.h"
 #include "wmhelper.h"
 #include "constants.h"
 #include <iostream>

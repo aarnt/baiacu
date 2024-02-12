@@ -1,6 +1,6 @@
 /*
-* This file is part of OctoPkg, an open-source GUI for pkgng.
-* Copyright (C) 2015 Alexandre Albuquerque Arnt
+* This file is part of Baiacu, an open-source GUI for OpenBSD pkg.
+* Copyright (C) 2024 Alexandre Albuquerque Arnt
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 #include "settingsmanager.h"
-//#include "unixcommand.h"
 #include "uihelper.h"
 
 #include <QString>
@@ -53,17 +52,6 @@ SettingsManager* SettingsManager::instance(){
 
   return m_pinstance;
 }
-
-//CacheCleaner related --------------------------------------------------------------
-int SettingsManager::getKeepNumInstalledPackages() {
-  return instance()->getSYSsettings()->value(ctn_KEEP_NUM_INSTALLED, 3).toInt();
-}
-
-int SettingsManager::getKeepNumUninstalledPackages() {
-  return instance()->getSYSsettings()->value(ctn_KEEP_NUM_UNINSTALLED, 1).toInt();
-}
-//CacheCleaner related --------------------------------------------------------------
-
 
 //Notifier related ------------------------------------------------------------------
 
