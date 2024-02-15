@@ -48,7 +48,6 @@ class QTextBrowser;
 class QMenu;
 class SearchLineEdit;
 class QAction;
-//class QActionGroup;
 class QTreeWidgetItem;
 class QElapsedTimer;
 
@@ -89,6 +88,7 @@ private:
   CPUIntensiveComputing *m_cic;
   UnixCommand *m_unixCommand;
   bool m_initializationCompleted;
+  bool m_ambiguousTransaction;
   SearchLineEdit *m_leFilterPackage;
   QList<QModelIndex> *m_foundFilesInPkgFileList;
   int m_indFoundFilesInPkgFileList;

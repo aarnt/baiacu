@@ -21,6 +21,7 @@
 #include "unixcommand.h"
 #include "wmhelper.h"
 #include "constants.h"
+#include "strconstants.h"
 #include <iostream>
 
 #include <QProcess>
@@ -612,6 +613,46 @@ QString UnixCommand::getPkgNGVersion()
 void UnixCommand::runCommandInTerminal(const QStringList& commandList){
   Q_UNUSED(commandList)
   //m_terminal->runCommandInTerminal(commandList);
+}
+
+/*
+ * Search for doas/sudo
+ */
+QString UnixCommand::getSudoProgram()
+{
+  if (QFile::exists(QStringLiteral("/usr/bin/doas")) &&
+      QFile::exists(QStringLiteral("/etc/doas.conf")))
+    return QLatin1String("doas");
+  else
+    return QLatin1String("sudo");
+}
+
+/*
+ * Executes the given command list as normal user
+ */
+void UnixCommand::runCommandInTerminalAsNormalUser(const QStringList &commandList)
+{
+  QString out;
+
+  for(QString line: commandList)
+  {
+    out += line;
+  }
+
+  QStringList params;
+  QString cmd = "xterm";
+  params << "-e";
+  params << getSudoProgram() + QLatin1String(" ") + UnixCommand::getShell() +
+            QLatin1String(" -c \"") + out + QLatin1Char('"');
+
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.remove("LANG");
+  env.remove("LC_MESSAGES");
+  env.insert("LANG", QLocale::system().name() + ".UTF-8");
+  env.insert("LC_MESSAGES", QLocale::system().name() + ".UTF-8");
+  m_process->setProcessEnvironment(env);
+
+  m_process->start(cmd, params);
 }
 
 /*

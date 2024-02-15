@@ -98,6 +98,7 @@ public:
   static QString getRemotePackageSearchTip();
   static QString getSyncing();
   static QString getPressAnyKey();
+  static QString getPressEnter();
   static QString getSyncDatabase();
   static QString getCheckUpdates();
   static QString getIsUpToDate();

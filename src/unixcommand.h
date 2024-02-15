@@ -88,7 +88,7 @@ public:
   static QByteArray getTargetUpgradeList(const QString &pkgName = "");
   static QByteArray getTargetRemovalList(const QString &pkgName);
 
-  //static QString getSystemArchitecture();
+  static QString getSudoProgram();
   static bool hasInternetConnection();
   static bool doInternetPingTest();
   static bool isTextFile( const QString& fileName ); //fileName is Path + Name

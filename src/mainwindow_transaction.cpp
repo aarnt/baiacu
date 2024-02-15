@@ -656,6 +656,12 @@ void MainWindow::doRemoveAndInstall()
 
   QStringList params;
 
+  m_lastCommandList.clear();
+  m_lastCommandList.append(ctn_PKG_DELETE_BIN + " " + listOfRemoveTargets + ";");
+  m_lastCommandList.append(ctn_PKG_ADD_BIN + " " + listOfInstallTargets + ";");
+  m_lastCommandList.append(QLatin1String("echo '") + StrConstants::getPressEnter() + QLatin1Char('\'') + ";");
+  m_lastCommandList.append("read dummy");
+
   params << UnixCommand::getShell();
   params << "-c";
   params << ctn_PKG_DELETE_BIN + " -I " + listOfRemoveTargets + "; " +
@@ -807,6 +813,11 @@ void MainWindow::doInstall()
   QString command;
 
   command = ctn_PKG_ADD_BIN + " -I " + listOfTargets;
+
+  m_lastCommandList.clear();
+  m_lastCommandList.append(ctn_PKG_ADD_BIN + " " + listOfTargets + ";");
+  m_lastCommandList.append(QLatin1String("echo '") + StrConstants::getPressEnter() + QLatin1Char('\'') + ";");
+  m_lastCommandList.append("read dummy");
 
   disableTransactionActions();
   m_unixCommand = new UnixCommand(this);
@@ -1171,6 +1182,7 @@ void MainWindow::cancelTransaction()
  */
 void MainWindow::actionsProcessStarted()
 {
+  m_ambiguousTransaction = false;
   m_progressWidget->setValue(0);
   m_progressWidget->setMaximum(100);
 
@@ -1248,13 +1260,21 @@ void MainWindow::actionsProcessFinished(int exitCode, QProcess::ExitStatus exitS
                      StrConstants::getCommandFinishedWithErrors() + "</b><br>");
   }
 
-  if (m_commandExecuting == ectn_CLEAN_CACHE)
+  if (m_ambiguousTransaction == true)
   {
-    enableTransactionActions();
-    m_unixCommand->removeTemporaryFile();
-    delete m_unixCommand;
-    m_commandExecuting = ectn_NONE;
-    return;
+    int res = QMessageBox::question(this, StrConstants::getAttention(),
+                                    StrConstants::getThereHasBeenATransactionError() + "\n\n" +
+                                    StrConstants::getConfirmExecuteTransactionInTerminal(),
+                                    QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+
+    if (res == QMessageBox::Yes)
+    {
+      metaBuildPackageList();
+
+      m_commandExecuting = ectn_RUN_IN_TERMINAL;
+      m_unixCommand->runCommandInTerminalAsNormalUser(m_lastCommandList);
+      return;
+    }
   }
 
   if (m_commandQueued == ectn_NONE)
@@ -1742,6 +1762,8 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
          newMsg.contains(StrConstants::getCommandFinishedWithErrors()) ||
          newMsg.contains(QRegularExpression("could not be found")))
       {
+        if (newMsg.startsWith("Ambiguous:")) m_ambiguousTransaction = true;
+
         newMsg = "<b><font color=\"#E55451\">" + newMsg + "&nbsp;</font></b>"; //RED
       }
       else if (newMsg.contains(QRegularExpression("warning")) ||

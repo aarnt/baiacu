@@ -314,6 +314,11 @@ QString StrConstants::getPressAnyKey(){
   return QObject::tr("Press any key to continue...");
 }
 
+QString StrConstants::getPressEnter()
+{
+  return QObject::tr("Press ENTER to continue...");
+}
+
 QString StrConstants::getSyncDatabase(){
   return QObject::tr("Sync database");
 }

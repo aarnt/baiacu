@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_packageRepo.registerDependency(*m_packageModel);
   m_foundFilesInPkgFileList = new QList<QModelIndex>();
   m_indFoundFilesInPkgFileList = 0;
+  m_ambiguousTransaction = false;
   m_callSystemUpgrade = false;
   m_callSystemUpgradeNoConfirm = false;
   m_initializationCompleted = false;
