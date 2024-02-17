@@ -1772,7 +1772,8 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
       {
         newMsg = "<b><font color=\"#FF8040\">" + newMsg + "</font></b>"; //ORANGE
       }
-      else if(newMsg.contains(QRegularExpression("[Rr]einstalling")) ||
+      else if(newMsg.contains(":ok") ||
+              newMsg.contains(QRegularExpression("[Rr]einstalling")) ||
               newMsg.contains(QRegularExpression("[Ii]nstalling")) ||
               newMsg.contains(QRegularExpression("[Uu]pgrading")) ||
               newMsg.contains(QRegularExpression("[Ll]oading")) ||
