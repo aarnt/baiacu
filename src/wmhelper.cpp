@@ -463,6 +463,11 @@ void WMHelper::openDirectory( const QString& dirName ){
       s << dir;
       p->startDetached( ctn_LUMINA_FILE_MANAGER, s );
     }
+    else if (UnixCommand::hasTheExecutable(ctn_LXQT_FILE_MANAGER))
+    {
+      s << dir;
+      p->startDetached( ctn_LXQT_FILE_MANAGER, s );
+    }
     else if (UnixCommand::hasTheExecutable(ctn_ANTERGOS_FILE_MANAGER))
     {
       s << dir;
