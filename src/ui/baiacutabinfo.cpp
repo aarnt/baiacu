@@ -62,7 +62,7 @@ QString BaiacuTabInfo::formatTabInfo(const PackageRepository::PackageData& packa
   html += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">";
   html += "<a id=\"" + anchorBegin + "\"></a>";
   html += "<h2>" + package.name + "</h2>";
-  html += pkgDescription;
+  html += pid.comment;
   html += "<table border=\"0\">";
   html += "<tr><th width=\"20%\"></th><th width=\"80%\"></th></tr>";
 
@@ -76,7 +76,7 @@ QString BaiacuTabInfo::formatTabInfo(const PackageRepository::PackageData& packa
   packagerName = packagerName.replace("<", "&lt;");
   packagerName = packagerName.replace(">", "&gt;");
 
-  html += "<tr><td>" + comment + "</td><td>" + pid.comment + "</td></tr><tr><td></tr></td>";
+  //html += "<tr><td>" + comment + "</td><td>" + pid.comment + "</td></tr><tr><td></tr></td>";
 
   html += "<tr><td>" + description + "</td><td>" + pid.description + "</td></tr><tr><td></tr></td>";
 
