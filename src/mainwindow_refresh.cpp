@@ -1104,7 +1104,7 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
  */
 void MainWindow::reapplyPackageFilter()
 {
-  clearTabsInfoOrFiles();
+  clearTabsInfoOrFilesExt();
 
   if (m_actionSwitchToRemoteSearch->isChecked())
   {
