@@ -26,7 +26,6 @@
 #include "searchlineedit.h"
 #include "mainwindow.h"
 #include "strconstants.h"
-//#include "wmhelper.h"
 #include "uihelper.h"
 #include "searchbar.h"
 #include "globals.h"
@@ -147,6 +146,17 @@ void MainWindow::keyPressEvent(QKeyEvent* ke)
       f = QtConcurrent::run(searchPacmanPackagesByFile, m_leFilterPackage->text());
       g_fwPackageOwnsFile.setFuture(f);
       connect(&g_fwPackageOwnsFile, SIGNAL(finished()), this, SLOT(positionInPkgListSearchByFile()));
+    }
+    else if (ui->tvPackages->hasFocus())
+    {
+      refreshTabFiles(false, true);
+      QTreeView *tvPkgFileList =
+          ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
+
+      if(tvPkgFileList)
+      {
+        tvPkgFileList->setFocus();
+      }
     }
     //We are probably inside 'Files' tab...
     else
@@ -281,10 +291,6 @@ void MainWindow::keyPressEvent(QKeyEvent* ke)
       }
     }
   }
-  /*else if(ke->key() == Qt::Key_D && ke->modifiers() == (Qt::ShiftModifier|Qt::ControlModifier))
-  {
-
-  }*/
   else if (ke->key() == Qt::Key_U && ke->modifiers() == Qt::ControlModifier)
   {
     if (m_commandExecuting != ectn_NONE) return;
