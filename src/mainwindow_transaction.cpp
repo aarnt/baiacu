@@ -621,6 +621,7 @@ void MainWindow::doSystemUpgrade()
 {
   if (!isSUAvailable()) return;
 
+  refreshDistroNews(true, false);
   prepareSystemUpgrade();
 
   m_commandExecuting = ectn_SYSTEM_UPGRADE;
@@ -1581,7 +1582,10 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
 
         if (altMsg.startsWith("quirks"))
         {
-          writeToTabOutputExt("<b><font color=\"#B4AB58\">" + altMsg + "</font></b>");
+          if (altMsg.contains(": ok"))
+            writeToTabOutputExt("<b><font color=\"#4BC413\">" + altMsg + "</font></b>");
+          else
+            writeToTabOutputExt("<b><font color=\"#B4AB58\">" + altMsg + "</font></b>");
         }
         else
           writeToTabOutputExt(altMsg); //BLACK
