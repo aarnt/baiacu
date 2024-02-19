@@ -134,6 +134,7 @@ void MainWindow::insertRemovePackageIntoTransaction(const QString &pkgName)
   QStandardItem * siPackageToRemove = new QStandardItem(IconHelper::getIconToRemove(), pkgName);
   QStandardItemModel *sim = qobject_cast<QStandardItemModel *>(siRemoveParent->model());
   QList<QStandardItem *> foundItems = sim->findItems(pkgName, Qt::MatchRecursive | Qt::MatchExactly);
+
   int slash = pkgName.indexOf("/");
   QString pkg = pkgName.mid(slash+1);
   siPackageToRemove->setText(pkg);
@@ -542,11 +543,6 @@ void MainWindow::prepareSystemUpgrade()
 {
   m_systemUpgradeDialog = false;
 
-  /*m_lastCommandList.clear();
-  m_lastCommandList.append(ctn_PKG_BIN + " upgrade;");
-  m_lastCommandList.append("echo -e;");
-  m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");*/
-
   m_unixCommand = new UnixCommand(this);
 
   QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
@@ -707,91 +703,6 @@ void MainWindow::doRemove()
 
   m_commandExecuting = ectn_REMOVE;
   m_unixCommand->executeCommand(command);
-
-  /*QStringList *_targets = Package::getTargetRemovalList(listOfTargets);
-  listOfTargets = "";
-  QString list;
-
-  for(QString target: *_targets)
-  {
-    list = list + target + "\n";
-    listOfTargets += target + " ";
-  }
-
-  TransactionDialog question(this);
-
-  //Shows a dialog indicating the targets which will be removed and asks for the user's permission.
-  if(_targets->count()==1)
-  {
-    question.setText(StrConstants::getRemovePackage());
-  }
-  else
-    question.setText(StrConstants::getRemovePackages(_targets->count()));
-
-  if (getNumberOfTobeRemovedPackages() < _targets->count())
-    question.setWindowTitle(StrConstants::getWarning());
-  else
-    question.setWindowTitle(StrConstants::getConfirmation());
-
-  question.setInformativeText(StrConstants::getConfirmationQuestion());
-  question.setDetailedText(list);
-  question.uncheckBootEnv();
-  int result = question.exec();
-
-  if(result == QDialogButtonBox::Yes || result == QDialogButtonBox::AcceptRole)
-  {
-    QString command;
-    QStringList params;
-
-    if (question.isBootEnvChecked())
-    {
-      QString beName = QDateTime::currentDateTime().toString(QLatin1String("yyMMdd-hhmmss"));
-      params << UnixCommand::getShell();
-      params << "-c";
-      params << "bectl create " + beName + "; " + ctn_PKG_BIN + " remove -R -y " + listOfTargets;
-    }
-    else
-    {
-      command = ctn_PKG_BIN + " remove -R -y " + listOfTargets;
-    }
-
-    m_lastCommandList.clear();
-    m_lastCommandList.append(ctn_PKG_BIN + " remove -R " + listOfTargets + ";");
-    m_lastCommandList.append("echo -e;");
-    m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");
-
-    m_unixCommand = new UnixCommand(this);
-
-    QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
-                     this, &MainWindow::actionsProcessReadOutput);
-    QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
-                     this, &MainWindow::actionsProcessFinished);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
-                     this, &MainWindow::actionsProcessRaisedError);
-
-    disableTransactionActions();
-
-    if (result == QDialogButtonBox::Yes)
-    {
-      m_commandExecuting = ectn_REMOVE;
-      if (params.count() > 0)
-        m_unixCommand->executeCommand(params);
-      else
-        m_unixCommand->executeCommand(command);
-    }
-
-    if (result == QDialogButtonBox::AcceptRole)
-    {
-      m_commandExecuting = ectn_RUN_IN_TERMINAL;
-      m_unixCommand->runCommandInTerminal(m_lastCommandList);
-    }
-  }
-  else
-  {
-    m_commandExecuting = ectn_NONE;
-    enableTransactionActions();
-  }*/
 }
 
 /*
@@ -833,101 +744,6 @@ void MainWindow::doInstall()
 
   m_commandExecuting = ectn_INSTALL;
   m_unixCommand->executeCommand(command);
-
-  /*QString listOfTargets = getTobeInstalledPackages();
-
-  TransactionInfo ti = g_fwTargetUpgradeList.result(); //Package::getTargetUpgradeList(listOfTargets);
-  QStringList *targets = ti.packages;
-
-  if (targets->count() == 0)
-  {
-    QMessageBox::critical( 0, StrConstants::getApplicationName(),
-                           StrConstants::getPkgNotAvailable());
-    enableTransactionActions();
-    return;
-  }
-
-  QString list;
-  QString ds = ti.sizeToDownload;
-
-  if (ti.sizeToDownload == "0") ds = "0.00 Bytes";
-
-  TransactionDialog question(this);
-
-  for(QString target: *targets)
-  {
-    list = list + target + "\n";
-  }
-
-  if(targets->count()==1)
-  {
-    question.setText(StrConstants::getRetrievePackage() +
-                          "\n\n" + StrConstants::getTotalDownloadSize().arg(ds).remove(" KB"));
-  }
-  else if (targets->count() > 1)
-    question.setText(StrConstants::getRetrievePackages(targets->count()) +
-                     "\n\n" + StrConstants::getTotalDownloadSize().arg(ds).remove(" KB"));
-
-  question.setWindowTitle(StrConstants::getConfirmation());
-  question.setInformativeText(StrConstants::getConfirmationQuestion());
-  question.setDetailedText(list);
-  question.uncheckBootEnv();
-  int result = question.exec();
-
-  if(result == QDialogButtonBox::Yes || result == QDialogButtonBox::AcceptRole)
-  {
-    disableTransactionButtons();
-
-    QStringList params;
-    QString command;
-
-    if (question.isBootEnvChecked())
-    {
-      QString beName = QDateTime::currentDateTime().toString(QLatin1String("yyMMdd-hhmmss"));
-      params << UnixCommand::getShell();
-      params << "-c";
-      params << "bectl create " + beName + "; " + ctn_PKG_BIN + " install -f -y " + listOfTargets;
-    }
-    else
-    {
-      command = ctn_PKG_BIN + " install -f -y " + listOfTargets;
-    }
-
-    m_lastCommandList.clear();
-    m_lastCommandList.append(ctn_PKG_BIN + " install -f " + listOfTargets + ";");
-    m_lastCommandList.append("echo -e;");
-    m_lastCommandList.append("read -n1 -p \"" + StrConstants::getPressAnyKey() + "\"");
-
-    disableTransactionActions();
-    m_unixCommand = new UnixCommand(this);
-
-    QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
-    QObject::connect(m_unixCommand, qOverload<int, QProcess::ExitStatus>(&UnixCommand::finished),
-                     this, &MainWindow::actionsProcessFinished);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
-                     this, &MainWindow::actionsProcessReadOutput);
-    QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
-                     this, &MainWindow::actionsProcessRaisedError);
-
-    if (result == QDialogButtonBox::Yes)
-    {
-      m_commandExecuting = ectn_INSTALL;
-      if (params.count() > 0)
-        m_unixCommand->executeCommand(params);
-      else
-        m_unixCommand->executeCommand(command);
-    }
-    else if (result == QDialogButtonBox::AcceptRole)
-    {
-      m_commandExecuting = ectn_RUN_IN_TERMINAL;
-      m_unixCommand->runCommandInTerminal(m_lastCommandList);
-    }
-  }
-  else
-  {
-    m_commandExecuting = ectn_NONE;
-    enableTransactionActions();
-  }*/
 }
 
 /*
