@@ -1461,41 +1461,6 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
     QRegularExpression regex;
     QRegularExpressionMatch match;
 
-    /*if (msg.contains("Fetching") && !msg.contains(QRegularExpression("B/s")))
-    {
-      int p = msg.indexOf(":");
-      if (p == -1) return; //Guard!
-
-      target = msg.left(p).remove("Fetching").trimmed();
-      pName = target;
-      regex.setPattern("\\[\\d+/\\d+\\]\\s\\s(.*)");
-      match = regex.match(target);
-      if (match.hasMatch())
-      {
-        pName = match.captured(1);
-      }
-
-      if(!textInTabOutput(pName))
-      {
-        if (!msg.contains("["))
-          writeToTabOutputExt("<b><font color=\"#FF8040\">Fetching " + target + "</font></b>");
-        else
-        {
-          writeToTabOutputExt("<b><font color=\"#B4AB58\">Fetching " + target + "</font></b>");
-        }
-      }
-    }
-    else if (msg.contains("Processing"))
-    {
-      int p = msg.indexOf(":");
-      if (p == -1) return; //Guard!
-
-      target = msg.left(p).remove("Processing").trimmed();
-
-      if(!textInTabOutput(target))
-        writeToTabOutputExt("Processing " + target + "...");
-        //writeToTabOutputExt("<b><font color=\"#4BC413\">Processing " + target + "</font></b>"); //GREEN
-    }*/
     if (msg.contains("Extracting") && perc == "100%") //else...
     {
       writeToTabOutputExt(msg);
