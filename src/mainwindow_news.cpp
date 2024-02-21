@@ -51,10 +51,10 @@ void MainWindow::refreshDistroNews(bool searchForLatestNews, bool gotoNewsTab)
     if (gotoNewsTab)
     {
       clearTabOutput();
+      writeToTabOutputExt("<b>" +
+                        StrConstants::getSearchingForBSDNews().arg("OpenBSD") + "</b>");
     }
 
-    writeToTabOutputExt("<b>" +
-                        StrConstants::getSearchingForBSDNews().arg("OpenBSD") + "</b>");
     /*
      * Here, we retrieve BSD's latest news without
      * blocking OctoPkg main interface.
@@ -182,9 +182,9 @@ void MainWindow::initTabNews()
   text->show();
 
   int tindex = ui->twProperties->insertTab(ctn_TABINDEX_NEWS, tabNews, QApplication::translate (
-      "MainWindow", aux.toUtf8(), 0/*, QApplication::UnicodeUTF8*/ ) );
+      "MainWindow", aux.toUtf8(), 0));
   ui->twProperties->setTabText(ui->twProperties->indexOf(tabNews), QApplication::translate(
-      "MainWindow", aux.toUtf8(), 0/*, QApplication::UnicodeUTF8*/));
+      "MainWindow", aux.toUtf8(), 0));
 
   SearchBar *searchBar = new SearchBar(this);
   connect(searchBar, SIGNAL(textChanged(QString)), this, SLOT(searchBarTextChangedInTextBrowser(QString)));
@@ -193,7 +193,6 @@ void MainWindow::initTabNews()
   connect(searchBar, SIGNAL(findPrevious()), this, SLOT(searchBarFindPreviousInTextBrowser()));
 
   gridLayoutX->addWidget(searchBar, 1, 0, 1, 1);
-
   connect(text, SIGNAL(sourceChanged(QUrl)), this, SLOT(onTabNewsSourceChanged(QUrl)));
 
   text->show();
