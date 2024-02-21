@@ -433,10 +433,17 @@ zimg-3.0.4   scaling, colorspace conversion, and dithering library
       pkgDescription = "";
       pkgComment = packageTuple.mid(space+1).trimmed();
 
-      if (isWeirdVersionPkg(packageTuple))
-        lastSep = nameVersion.indexOf("-");
-      else
-        lastSep = nameVersion.lastIndexOf("-");
+      lastSep = packageTuple.indexOf("-");
+
+      while (lastSep > 0 && lastSep < packageTuple.size()-1)
+      {
+        if (!packageTuple.at(lastSep+1).isDigit())
+          lastSep = packageTuple.indexOf("-", lastSep+1);
+        else break;
+      }
+
+      if (lastSep < 0)
+        lastSep = packageTuple.indexOf("-");
 
       pkgName = nameVersion.left(lastSep);
       pkgVersion = nameVersion;
@@ -491,14 +498,17 @@ QList<PackageListData> * Package::parsePackageTuple(const QStringList &packageTu
       pld.installedOn = "";
     }
 
-    if (isWeirdVersionPkg(packageTuple))
+    lastSep = packageTuple.indexOf("-");
+
+    while (lastSep > 0 && lastSep < packageTuple.size()-1)
     {
+      if (!packageTuple.at(lastSep+1).isDigit())
+        lastSep = packageTuple.indexOf("-", lastSep+1);
+      else break;
+    }
+
+    if (lastSep < 0)
       lastSep = packageTuple.indexOf("-");
-    }
-    else
-    {
-      lastSep = packageTuple.lastIndexOf("-");
-    }
 
     pkgVersion = packageTuple.mid(lastSep+1).trimmed();
     pkgName = packageTuple.left(lastSep);
