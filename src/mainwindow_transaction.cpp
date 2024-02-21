@@ -1255,8 +1255,6 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
     if (!m_progressWidget->isVisible())
     {
       m_progressWidget->show();
-      //if (m_commandExecuting != ectn_CHECK_UPDATES)
-        //m_toolButtonStopTransaction->setVisible(true);
     }
 
     m_progressWidget->setValue(100);
