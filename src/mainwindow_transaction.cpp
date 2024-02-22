@@ -1224,6 +1224,10 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
 
   msg.remove(QRegularExpression(".+\\[Y/n\\].+"));
 
+  msg.remove(QRegularExpression("\\[K"));
+
+  msg.remove(QRegularExpression("\\[\\d*G"));
+
   //Let's remove color codes from strings...
   msg.remove("\033[0;1m");
   msg.remove("\033[0m");
@@ -1555,7 +1559,7 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
       {
         newMsg = "<b><font color=\"#FF8040\">" + newMsg + "</font></b>"; //ORANGE
       }
-      else if((newMsg.contains(": ok") && (m_commandExecuting != ectn_REMOVE)) ||
+      else if(newMsg.contains(": ok") || //&& (m_commandExecuting != ectn_REMOVE)) ||
               newMsg.contains(QRegularExpression("[Rr]einstalling")) ||
               newMsg.contains(QRegularExpression("[Ii]nstalling")) ||
               newMsg.contains(QRegularExpression("[Uu]pgrading")) ||
@@ -1584,9 +1588,9 @@ void MainWindow::writeToTabOutputExt(const QString &msg, TreatURLLinks treatURLL
                (!newMsg.contains(QRegularExpression("\\):"))) &&
                (!newMsg.contains(QRegularExpression(":$"))))
       {
-        if (m_commandExecuting == ectn_REMOVE)
-          newMsg = "<b><font color=\"#E55451\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
-        else
+        //if (m_commandExecuting == ectn_REMOVE)
+        //  newMsg = "<b><font color=\"#E55451\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
+        //else
           newMsg = "<b><font color=\"#B4AB58\">" + newMsg + "</font></b>"; //IT'S A PKGNAME!
       }
     }
