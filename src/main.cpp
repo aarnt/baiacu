@@ -19,6 +19,7 @@
 */
 
 #include "mainwindow.h"
+#include "constants.h"
 #include "argumentlist.h"
 #include "strconstants.h"
 #include "unixcommand.h"
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  if(!QFile::exists("/usr/local/lib/baiacu/baiacu-doas"))
+  if(!QFile::exists(ctn_BAIACU_DOAS))
   {
     QMessageBox::critical( 0, StrConstants::getApplicationName(), StrConstants::getOctoPKGDoasNotFound());
     delete argList;

@@ -465,7 +465,7 @@ QString StrConstants::getYoullNeedSuFrontend(){
 }
 
 QString StrConstants::getOctoPKGDoasNotFound(){
-  return QObject::tr("\"/usr/lib/baiacu/baiacu\" was not found!");
+  return QObject::tr("\"/usr/local/bin/qt-sudo\" was not found!");
 }
 
 QString StrConstants::getErrorNoPkgFound(){
