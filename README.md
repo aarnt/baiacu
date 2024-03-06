@@ -3,8 +3,7 @@
 ![Main window](https://raw.githubusercontent.com/aarnt/baiacu/main/baiacu-mainwindow.png)
 
 **Baiacu** is a Qt based GUI front end to the OpenBSD package manager, derived from [OctoPkg](http://tintaescura.com/projects/octopkg).
-It consists of a lxqt-sudo clone called [baiacu-doas](https://github.com/aarnt/baiacu/tree/main/doas) used to gain root privileges and a package browser application used
-to search, install, remove and update packages.
+It consists of a lxqt-sudo clone called [qt-sudo](https://github.com/aarnt/qt-sudo) used to gain root privileges and a package browser application used to search, install, remove and update packages.
 
 Baiacu is also a [Tupi-Guarani](https://en.wikipedia.org/wiki/Tupi%E2%80%93Guarani_languages) word that means "the hot and poisonous thing, because of its gall".
 
@@ -12,11 +11,7 @@ Baiacu is also a [Tupi-Guarani](https://en.wikipedia.org/wiki/Tupi%E2%80%93Guara
 
 ```
 $ git clone https://github.com/aarnt/baiacu
-$ cd baiacu/doas
-$ qmake-qt5
-$ make
-# make install
-$ cd ..
+$ cd baiacu
 $ qmake-qt5
 $ make
 # make install
