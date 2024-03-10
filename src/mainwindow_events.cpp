@@ -291,6 +291,20 @@ void MainWindow::keyPressEvent(QKeyEvent* ke)
       }
     }
   }
+  else if(ke->key() == Qt::Key_F && ke->modifiers() == (Qt::ShiftModifier|Qt::ControlModifier))
+  {
+    QStandardItem * siInstall = getInstallTransactionParentItem();
+    int nip = siInstall->rowCount();
+
+    QStandardItem * siRemove = getRemoveTransactionParentItem();
+    int nrp = siRemove->rowCount();
+
+    if (ui->actionCommit->isEnabled() && nip > 0 && nrp == 0)
+    {
+      m_fakeInstallFlag = " -n ";
+      commitTransaction();
+    }
+  }
   else if (ke->key() == Qt::Key_U && ke->modifiers() == Qt::ControlModifier)
   {
     if (m_commandExecuting != ectn_NONE) return;

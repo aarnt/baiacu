@@ -129,6 +129,10 @@ void MainWindow::initTabHelpUsage()
      tr("Ctrl+Q or 'File/Exit' to exit the application") +
   QString("</li></ul>") +
 
+  tr("Control+Shift+key sequences:") +
+  QString("<ul><li>") +
+     tr("Ctrl+Shift+F to fake install selected packages") +
+
   QString("</li></ul>") +
      tr("F+key sequences:") +
   QString("<ul><li>") +

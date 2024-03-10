@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_unrequiredPackageList = NULL;
   m_foreignPackageList = NULL;
   m_unixCommand = nullptr;
+  m_fakeInstallFlag = "";
 
   retrieveUnrequiredPackageList();
 

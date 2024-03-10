@@ -147,6 +147,8 @@ private:
   CommandExecuting m_commandExecuting;
   CommandExecuting m_commandQueued;
 
+  QString m_fakeInstallFlag;
+
   //This member holds the last command string executed by OctoPkg
   QStringList m_lastCommandList;
 

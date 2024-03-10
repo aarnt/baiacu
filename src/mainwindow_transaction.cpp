@@ -724,7 +724,7 @@ void MainWindow::doInstall()
   QString listOfTargets = getTobeInstalledPackages();
   QString command;
 
-  command = ctn_PKG_ADD_BIN + " -I " + listOfTargets;
+  command = ctn_PKG_ADD_BIN + " -I " + m_fakeInstallFlag + listOfTargets;
 
   m_lastCommandList.clear();
   m_lastCommandList.append(ctn_PKG_ADD_BIN + " " + listOfTargets + ";");
@@ -1056,6 +1056,8 @@ void MainWindow::actionsProcessStarted()
 void MainWindow::actionsProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
   //m_toolButtonStopTransaction->setVisible(false);
+
+  m_fakeInstallFlag = "";
 
   //bool bRefreshGroups = true;
   m_progressWidget->close();
