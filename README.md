@@ -7,7 +7,7 @@ It consists of a lxqt-sudo clone called [qt-sudo](https://github.com/aarnt/qt-su
 
 Baiacu is also a [Tupi-Guarani](https://en.wikipedia.org/wiki/Tupi%E2%80%93Guarani_languages) word that means "the hot and poisonous thing, because of its gall".
 
-### Follow the steps bellow to compile the latest source code (you'll need git and qt5 packages):
+### Follow the steps bellow to compile the latest source code (you'll need git and qt5 or qt6 packages):
 
 ```
 $ git clone https://github.com/aarnt/baiacu
