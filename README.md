@@ -17,6 +17,17 @@ $ make
 # make install
 ```
 
+### Add these lines in your /etc/doas.conf for qt-sudo work with OpenBSD:
+```
+# with password
+#permit keepenv setenv { USER=root HOME=/root \
+#XAUTHORITY=/home/<your_username_here/.Xauthority } <your_username_here
+
+# without password
+permit nopass keepenv setenv { USER=root HOME=/root \
+XAUTHORITY=/home/<your_username_here>/.Xauthority } <your_username_here>
+```
+
 ### In order to run Baiacu:
 
 ```
