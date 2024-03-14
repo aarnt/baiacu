@@ -1216,7 +1216,7 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   if (m_commandExecuting == ectn_RUN_IN_TERMINAL ||
       m_commandExecuting == ectn_RUN_SYSTEM_UPGRADE_IN_TERMINAL) return;
 
-  if (pMsg.at(0) == "[") return;
+  if (pMsg.at(0) == '[') return;
 
   bool continueTesting = false;
   QString perc;
