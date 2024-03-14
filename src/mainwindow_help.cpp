@@ -188,8 +188,8 @@ void MainWindow::onHelpAbout()
   QString aboutText = "<b>" + StrConstants::getApplicationName() + QLatin1String("</b><br><br>");
   aboutText += StrConstants::getVersion() + QLatin1String(": ") + StrConstants::getApplicationVersion() +
       QLatin1String(" - ") + StrConstants::getQtVersion() + QLatin1String("<br>");
-  //aboutText += StrConstants::getURL() + QLatin1String(": ") +
-  //  QStringLiteral("<a href=\"https://tintaescura.com/projects/octopkg/\">https://tintaescura.com/projects/octopkg</a><br>");
+  aboutText += StrConstants::getURL() + QLatin1String(": ") +
+    QStringLiteral("<a href=\"https://tintaescura.com/projects/baiacu/\">https://tintaescura.com/projects/baiacu</a><br>");
   aboutText += StrConstants::getLicenses() + QLatin1String(": ") +
       QStringLiteral("<a href=\"http://www.gnu.org/licenses/gpl-2.0.html\">GPL v2</a><br><br>");
   aboutText += QStringLiteral("&copy; Alexandre Albuquerque Arnt<br><br>");
