@@ -1369,10 +1369,10 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
         {
           if (altMsg.contains(": ok"))
             writeToTabOutputExt("<b><font color=\"#4BC413\">" + altMsg + "</font></b>");
-          else
+          else if (!textInTabOutput(altMsg))
             writeToTabOutputExt("<b><font color=\"#B4AB58\">" + altMsg + "</font></b>");
         }
-        else
+        else if (!textInTabOutput(altMsg))
           writeToTabOutputExt(altMsg); //BLACK
       }
     }
