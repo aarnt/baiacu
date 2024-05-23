@@ -139,7 +139,7 @@
      <x>0</x>
      <y>0</y>
      <width>552</width>
-     <height>24</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -346,7 +346,7 @@
      <normaloff>:/resources/images/rss.png</normaloff>:/resources/images/rss.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Get latest BSD news</string>
+    <string>&amp;Get latest OpenBSD news</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
