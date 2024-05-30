@@ -544,6 +544,7 @@ void MainWindow::prepareSystemUpgrade()
   m_systemUpgradeDialog = false;
 
   m_unixCommand = new UnixCommand(this);
+  disableTransactionActions();
 
   QObject::connect(m_unixCommand, &UnixCommand::started, this, &MainWindow::actionsProcessStarted);
   QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardOutput,
@@ -552,8 +553,6 @@ void MainWindow::prepareSystemUpgrade()
                    this, &MainWindow::actionsProcessFinished);
   QObject::connect(m_unixCommand, &UnixCommand::readyReadStandardError,
                    this, &MainWindow::actionsProcessRaisedError);
-
-  disableTransactionActions();
 }
 
 /*
@@ -617,7 +616,7 @@ void MainWindow::doSystemUpgrade()
 {
   if (!isSUAvailable()) return;
 
-  refreshDistroNews(true, false);
+  //refreshDistroNews(true, false);
   prepareSystemUpgrade();
 
   m_commandExecuting = ectn_SYSTEM_UPGRADE;
