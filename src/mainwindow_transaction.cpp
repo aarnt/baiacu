@@ -1175,6 +1175,7 @@ void MainWindow::actionsProcessFinished(int exitCode, QProcess::ExitStatus exitS
  */
 void MainWindow::resetTransaction()
 {
+  clearTabsInfoOrFiles();
   enableTransactionActions();
   //if (m_commandExecuting != ectn_MIRROR_CHECK && bRefreshGroups)
   //  refreshGroupsWidget();

@@ -271,6 +271,8 @@ void MainWindow::preBuildPackageList()
   if(m_debugInfo)
     std::cout << "Time elapsed obtaining pkgs from 'ALL group' list: " << m_time->elapsed() << " mili seconds." << std::endl;
 
+  disconnect(this, SIGNAL(buildPackageListDone()), this, SLOT(resetTransaction()));
+  connect(this, SIGNAL(buildPackageListDone()), this, SLOT(resetTransaction()));
   buildPackageList();
   toggleSystemActions(true);
 
