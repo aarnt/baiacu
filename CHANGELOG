@@ -1,2 +1,6 @@
-0.1.0 (dev)
+0.1.1 (dev)
+  BugFix: The act of moving the mouse over the package list was triggering many
+    pkg executions.
+
+0.1.0
   Initial Proof of Concept release.
