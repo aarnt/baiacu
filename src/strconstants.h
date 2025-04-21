@@ -30,6 +30,7 @@ public:
   static QString getApplicationVersion();
   static QString getQtVersion();
   static QString getApplicationCliHelp();
+  static QString getError();
   static QString getAll();
   static QString getOpenBSDNews();
   static QString getNewsErrorMessage();

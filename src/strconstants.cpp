@@ -42,6 +42,10 @@ QString StrConstants::getApplicationCliHelp(){
   return str;
 }
 
+QString StrConstants::getError(){
+  return QObject::tr("Error");
+}
+
 QString StrConstants::getAll(){
   return QObject::tr("All");
 }

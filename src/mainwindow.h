@@ -287,8 +287,8 @@ private:
   void refreshStatusBarToolButtons();
 
   void switchToViewAllPackages();
-
   void retrieveUnrequiredPackageList();
+  bool isInternetAvailable();
 
 private slots:
   void initToolButtonPacman();
