@@ -1240,6 +1240,8 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   if (m_commandExecuting == ectn_RUN_IN_TERMINAL ||
       m_commandExecuting == ectn_RUN_SYSTEM_UPGRADE_IN_TERMINAL) return;
 
+  //qDebug() << "out: " << pMsg;
+
   if (pMsg.at(0) == '[') return;
 
   bool continueTesting = false;
@@ -1253,6 +1255,10 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   msg.remove(QRegularExpression("\\[K"));
 
   msg.remove(QRegularExpression("\\[\\d*G"));
+
+  msg.remove(QRegularExpression("virtual const QPalette.+"));
+
+  msg.remove(QRegularExpression("virtual QVariant.+"));
 
   //Let's remove color codes from strings...
   msg.remove("\033[0;1m");
