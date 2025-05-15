@@ -1,6 +1,7 @@
 0.1.1 (dev)
   BugFix: The act of moving the mouse over the package list was triggering many
     pkg executions.
+  BugFix: Removed 2 more buggy strings from parser output (Qt6 related).
   Added internet check before pkg actions.
 
 0.1.0
