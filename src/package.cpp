@@ -295,7 +295,14 @@ QSet<QString>* Package::getUnrequiredPackageList()
     if (sl.size() >= 1)
     {
       pkgName = sl.at(0);
-      lastSep = pkgName.lastIndexOf("-");
+      // Vim is a package that has flavours
+      if (pkgName.contains("vim-"))
+      {
+        lastSep = pkgName.indexOf("-");
+      }
+      else
+        lastSep = pkgName.lastIndexOf("-");
+
       pkgName = pkgName.left(lastSep);
 
       res->insert(pkgName);
