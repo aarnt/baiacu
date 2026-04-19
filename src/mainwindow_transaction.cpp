@@ -1251,14 +1251,13 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   QString progressEnd;
 
   msg.remove(QRegularExpression(".+\\[Y/n\\].+"));
-
   msg.remove(QRegularExpression("\\[K"));
-
   msg.remove(QRegularExpression("\\[\\d*G"));
-
   msg.remove(QRegularExpression("virtual const QPalette.+"));
-
   msg.remove(QRegularExpression("virtual QVariant.+"));
+  msg.remove(QRegularExpression("^Detected locale.+"));
+  msg.remove(QRegularExpression("^Qt depends on a.+"));
+  msg.remove(QRegularExpression("^for more information\\."));
 
   //Let's remove color codes from strings...
   msg.remove("\033[0;1m");
