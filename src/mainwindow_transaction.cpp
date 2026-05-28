@@ -1242,7 +1242,7 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
 
   //qDebug() << "out: " << pMsg;
 
-  if (pMsg.at(0) == '[') return;
+  //if (pMsg.at(0) == '[') return;
 
   bool continueTesting = false;
   QString perc;
@@ -1250,6 +1250,16 @@ void MainWindow::parsePkgProcessOutput(const QString &pMsg)
   QString progressRun;
   QString progressEnd;
 
+  //std::cout << "_treat: " << msg.toLatin1().data() << std::endl;
+
+  //static const QRegularExpression re(QStringLiteral(R"(^\\[\\d{2}C)"));
+  msg.remove(QRegularExpression("No change in.+"));
+  msg.remove(QRegularExpression("No change i.+"));
+  msg.remove(QRegularExpression("No change "));
+  msg.remove(QRegularExpression("No chan "));
+  msg.remove(QRegularExpression("No chang.+"));
+  msg.remove(QRegularExpression("No ch.+"));
+  msg.remove(QRegularExpression("\\[\\d{2}C"));
   msg.remove(QRegularExpression(".+\\[Y/n\\].+"));
   msg.remove(QRegularExpression("\\[K"));
   msg.remove(QRegularExpression("\\[\\d*G"));
