@@ -141,7 +141,7 @@ QByteArray UnixCommand::getRemotePackageList(const QString &searchString, bool u
   QByteArray result("");
 
   QStringList sl;
-  sl << "-Q";
+  sl << "-aQ";
   sl << searchString;
   result = performQuery(sl);
 

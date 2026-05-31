@@ -338,12 +338,11 @@ void MainWindow::metaBuildPackageList()
     if(!m_leFilterPackage->text().isEmpty())
     {
       m_toolButtonPacman->hide();
-      disconnect(&g_fwRemoteMeta, SIGNAL(finished()), this, SLOT(preBuildRemotePackageListMeta()));
-
       QFuture<QList<PackageListData> *> f;
+      disconnect(&g_fwRemote, SIGNAL(finished()), this, SLOT(preBuildRemotePackageList()));
       f = QtConcurrent::run(searchRemotePackages, m_leFilterPackage->text());
-      connect(&g_fwRemoteMeta, SIGNAL(finished()), this, SLOT(preBuildRemotePackageListMeta()));
-      g_fwRemoteMeta.setFuture(f);
+      g_fwRemote.setFuture(f);
+      connect(&g_fwRemote, SIGNAL(finished()), this, SLOT(preBuildRemotePackageList()));
     }
     else
     {
@@ -870,7 +869,7 @@ void MainWindow::refreshTabInfo(bool clearContents, bool neverQuit)
 /*
  * Re-populates the treeview which contains the file list of selected package (tab TWO)
  */
-void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
+/*void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
 {  
   if (m_progressWidget->isVisible() || !m_initializationCompleted) return;
 
@@ -1099,6 +1098,286 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
 
   if (filterHasFocus) m_leFilterPackage->setFocus();
   else if (tvPackagesHasFocus) ui->tvPackages->setFocus();
+}*/
+
+/*
+ * Optimized version: builds the tree using a path map for items,
+ * eliminating the need to recalculate fullPath repeatedly
+ */
+void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
+{
+  if (m_progressWidget->isVisible() || !m_initializationCompleted) return;
+
+  if (!neverQuit &&
+      (ui->twProperties->currentIndex() != ctn_TABINDEX_FILES || !isPropertiesTabWidgetVisible()))
+  {
+    return;
+  }
+
+  bool filterHasFocus = m_leFilterPackage->hasFocus();
+  bool tvPackagesHasFocus = ui->tvPackages->hasFocus();
+
+  QItemSelectionModel *const selectionModel = ui->tvPackages->selectionModel();
+
+  if (clearContents || selectionModel == nullptr ||
+      selectionModel->selectedRows(PackageModel::ctn_PACKAGE_NAME_COLUMN).count() == 0)
+  {
+    QTreeView *const tvPkgFileList = ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
+
+    if (tvPkgFileList)
+    {
+      QStandardItemModel *const modelPkgFileList =
+          qobject_cast<QStandardItemModel *>(tvPkgFileList->model());
+      modelPkgFileList->clear();
+      m_cachedPackageInFiles = QLatin1String("");
+      closeTabFilesSearchBar();
+      if (filterHasFocus) m_leFilterPackage->setFocus();
+      else if (tvPackagesHasFocus) ui->tvPackages->setFocus();
+      return;
+    }
+  }
+
+  QModelIndex pkg = selectionModel->selectedRows(PackageModel::ctn_PACKAGE_NAME_COLUMN).first();
+  const PackageRepository::PackageData *const package = m_packageModel->getData(pkg);
+
+  if (package == nullptr) {
+    assert(false);
+    return;
+  }
+
+  const QString cacheKey = package->repository + QLatin1Char('#') +
+                           package->name + QLatin1Char('#') + package->version;
+
+  if (m_cachedPackageInFiles == cacheKey)
+  {
+    if (neverQuit)
+    {
+      changeTabWidgetPropertiesIndex(ctn_TABINDEX_FILES);
+      selectFirstItemOfPkgFileList();
+    }
+    else
+    {
+      QTreeView *const tv = ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
+      if (tv)
+        tv->scrollTo(tv->currentIndex());
+    }
+    return;
+  }
+
+  QTreeView *const tvPkgFileList = ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
+  if (!tvPkgFileList)
+  {
+    m_cachedPackageInFiles = cacheKey;
+    return;
+  }
+
+  const QString pkgName = package->name;
+
+  // --- Get list of files in separate thread ---
+  QEventLoop el;
+  QFutureWatcher<QStringList> fwPackageContents;
+  QFuture<QStringList> f = QtConcurrent::run(Package::getContents, pkgName);
+  connect(&fwPackageContents, SIGNAL(finished()), &el, SLOT(quit()));
+  fwPackageContents.setFuture(f);
+  el.exec();
+  const QStringList fileList = fwPackageContents.result();
+
+  if (m_debugInfo) m_time->start();
+
+  // --- Build a model using HashMap for an O(1) lookup ---
+  QStandardItemModel *modelPkgFileList = new QStandardItemModel(this);
+  QStandardItem *root = modelPkgFileList->invisibleRootItem();
+
+
+  // Cache: directory path -> QStandardItem*
+  // We use QHash for an O(1) lookup instead of traversing the tree
+  QHash<QString, QStandardItem *> dirMap;
+  dirMap.insert(QString(), root); // raiz vazia
+
+  // Icon pre-caching (avoids calling getIcon* thousands of times)
+  const QIcon iconFolder = IconHelper::getIconFolder();
+  const QIcon iconBinary = IconHelper::getIconBinary();
+
+  const int totalFiles = fileList.count();
+  int counter = 0;
+
+  // Update progress every N items to reduce UI overhead.
+  const int progressStep = qMax(1, totalFiles / 100);
+  m_progressWidget->setRange(0, totalFiles);
+  m_progressWidget->setValue(0);
+  m_progressWidget->show();
+
+  // Disable sorting during insertion.
+  tvPkgFileList->setSortingEnabled(false);
+
+  for (const QString &file : fileList)
+  {
+    bool isDir = file.endsWith(QLatin1Char('/'));
+
+    // Normalize: remove trailing '/' for uniform processing.
+    QString normalizedPath = file;
+    if (isDir && normalizedPath.length() > 1)
+      normalizedPath.chop(1);
+
+    // Separate into parent directory and base name.
+    int lastSep = normalizedPath.lastIndexOf(QLatin1Char('/'));
+    QString parentPath, baseName;
+
+    if (lastSep == -1)
+    {
+      parentPath = QString();
+      baseName = normalizedPath;
+    }
+    else if (lastSep == 0)
+    {
+      // File/directory in the root directory, e.g., "/usr"
+      parentPath = QString();
+      baseName = normalizedPath.mid(1);
+    }
+    else
+    {
+      parentPath = normalizedPath.left(lastSep);
+      baseName = normalizedPath.mid(lastSep + 1);
+    }
+
+    if (baseName.isEmpty())
+    {
+      counter++;
+      continue;
+    }
+
+    // Determine if it's a symlink to a directory (only if it's not a dir).
+    bool isSymLinkToDir = false;
+    if (!isDir)
+    {
+      QFileInfo fi(file);
+      if (fi.isSymLink())
+      {
+        QFileInfo fiTarget(fi.symLinkTarget());
+        isSymLinkToDir = fiTarget.isDir();
+      }
+    }
+
+    bool treatAsDir = isDir || isSymLinkToDir;
+
+    QStandardItem *item;
+    if (treatAsDir)
+    {
+      item = new QStandardItem(iconFolder, baseName);
+      item->setAccessibleDescription(QLatin1String("directory ") + baseName);
+    }
+    else
+    {
+      item = new QStandardItem(iconBinary, baseName);
+      item->setAccessibleDescription(QLatin1String("file ") + baseName);
+    }
+
+    // Find or create the parent — ensure that all ancestral directories exist
+    // (in case the list is not perfectly ordered)
+    QStandardItem *parentItem = ensureDirectoryExists(
+        parentPath, dirMap, root, iconFolder);
+
+    parentItem->appendRow(item);
+
+    // If it's a directory, register it in the map for future children.
+    if (treatAsDir)
+    {
+      QString fullDirPath = normalizedPath;
+      // Normalize to avoid inconsistent initial '/'
+      dirMap.insert(fullDirPath, item);
+    }
+
+    counter++;
+
+    // Update progress only periodically.
+    if (counter % progressStep == 0 || counter == totalFiles)
+    {
+      m_progressWidget->setValue(counter);
+    }
+  }
+
+  m_progressWidget->close();
+  modelPkgFileList->sort(0);
+
+  QAbstractItemModel *oldModel = tvPkgFileList->model();
+  tvPkgFileList->setModel(modelPkgFileList);
+  tvPkgFileList->header()->setDefaultAlignment(Qt::AlignCenter);
+  modelPkgFileList->setHorizontalHeaderLabels(
+      QStringList() << StrConstants::getContentsOf().arg(pkgName));
+
+  if (counter > 0)
+    tvPkgFileList->expandAll();
+
+  // Delete the old model if it's not the same.
+  if (oldModel && oldModel != modelPkgFileList)
+    oldModel->deleteLater();
+
+  if (m_debugInfo)
+    std::cout << "Time for contents of " << pkgName.toLatin1().data()
+              << " (" << counter << "): " << m_time->elapsed()
+              << " mili seconds." << std::endl;
+
+  m_cachedPackageInFiles = cacheKey;
+
+  if (neverQuit)
+  {
+    changeTabWidgetPropertiesIndex(ctn_TABINDEX_FILES);
+    selectFirstItemOfPkgFileList();
+  }
+
+  closeTabFilesSearchBar();
+
+  if (filterHasFocus) m_leFilterPackage->setFocus();
+  else if (tvPackagesHasFocus) ui->tvPackages->setFocus();
+}
+
+/*
+ * Ensures that a directory and all its ancestors exist in the map/model.
+ * Returns the QStandardItem* corresponding to the path.
+ */
+QStandardItem *MainWindow::ensureDirectoryExists(
+    const QString &path,
+    QHash<QString, QStandardItem *> &dirMap,
+    QStandardItem *root,
+    const QIcon &iconFolder)
+{
+  if (path.isEmpty())
+    return root;
+
+  auto it = dirMap.find(path);
+  if (it != dirMap.end())
+    return it.value();
+
+  // It doesn't exist — we need to create it.
+  // First, ensure that the father exists.
+  int lastSep = path.lastIndexOf(QLatin1Char('/'));
+  QString parentPath;
+  QString dirName;
+
+  if (lastSep == -1)
+  {
+    parentPath = QString();
+    dirName = path;
+  }
+  else if (lastSep == 0)
+  {
+    parentPath = QString();
+    dirName = path.mid(1);
+  }
+  else
+  {
+    parentPath = path.left(lastSep);
+    dirName = path.mid(lastSep + 1);
+  }
+
+  QStandardItem *parentItem = ensureDirectoryExists(parentPath, dirMap, root, iconFolder);
+
+  QStandardItem *dirItem = new QStandardItem(iconFolder, dirName);
+  dirItem->setAccessibleDescription(QLatin1String("directory ") + dirName);
+  parentItem->appendRow(dirItem);
+
+  dirMap.insert(path, dirItem);
+  return dirItem;
 }
 
 /*
