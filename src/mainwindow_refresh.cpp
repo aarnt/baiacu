@@ -868,9 +868,389 @@ void MainWindow::refreshTabInfo(bool clearContents, bool neverQuit)
 }
 
 /*
- * Re-populates the treeview which contains the file list of selected package (tab TWO)
+ * NEW Optimized CODE
+ *
+ * builds the tree using a path map for items,
+ * eliminating the need to recalculate fullPath repeatedly
  */
 void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
+{
+  if (m_progressWidget->isVisible() || !m_initializationCompleted)
+    return;
+
+  if (!neverQuit &&
+      (ui->twProperties->currentIndex() != ctn_TABINDEX_FILES ||
+       !isPropertiesTabWidgetVisible()))
+  {
+    return;
+  }
+
+  const bool filterHasFocus = m_leFilterPackage->hasFocus();
+  const bool tvPackagesHasFocus = ui->tvPackages->hasFocus();
+
+  QItemSelectionModel *const selectionModel =
+      ui->tvPackages->selectionModel();
+
+  QTreeView *const tvPkgFileList =
+      ui->twProperties->widget(ctn_TABINDEX_FILES)->findChild<QTreeView*>("tvPkgFileList");
+
+  if (!tvPkgFileList)
+    return;
+
+  if (clearContents ||
+      !selectionModel ||
+      selectionModel->selectedRows(
+                        PackageModel::ctn_PACKAGE_NAME_COLUMN).isEmpty())
+  {
+    if (QStandardItemModel *model =
+        qobject_cast<QStandardItemModel *>(tvPkgFileList->model()))
+    {
+      model->clear();
+    }
+
+    m_cachedPackageInFiles.clear();
+    closeTabFilesSearchBar();
+
+    if (filterHasFocus)
+      m_leFilterPackage->setFocus();
+    else if (tvPackagesHasFocus)
+      ui->tvPackages->setFocus();
+
+    return;
+  }
+
+  const QModelIndex pkg =
+      selectionModel->selectedRows(
+                        PackageModel::ctn_PACKAGE_NAME_COLUMN).first();
+
+  const PackageRepository::PackageData *const package =
+      m_packageModel->getData(pkg);
+
+  if (!package)
+  {
+    assert(false);
+    return;
+  }
+
+  const QString cacheKey =
+      package->repository + QLatin1Char('#') +
+      package->name + QLatin1Char('#') +
+      package->version;
+
+  if (m_cachedPackageInFiles == cacheKey)
+  {
+    if (neverQuit)
+    {
+      changeTabWidgetPropertiesIndex(ctn_TABINDEX_FILES);
+      selectFirstItemOfPkgFileList();
+    }
+    else
+    {
+      if (tvPkgFileList->model())
+        tvPkgFileList->scrollTo(
+            tvPkgFileList->currentIndex());
+    }
+
+    return;
+  }
+
+  const bool installed = package->installed();
+  const QString pkgName = package->name;
+
+  // ------------------------------------------------------------
+  // Get contents
+  // ------------------------------------------------------------
+
+  QFutureWatcher<QStringList> watcher;
+  QEventLoop loop;
+
+  QObject::connect(
+      &watcher,
+      &QFutureWatcher<QStringList>::finished,
+      &loop,
+      &QEventLoop::quit);
+
+  watcher.setFuture(
+      QtConcurrent::run(
+          Package::getContents,
+          pkgName));
+          //installed));
+
+  loop.exec();
+
+  const QStringList fileList = watcher.result();
+
+  if (m_debugInfo)
+    m_time->start();
+
+  // ------------------------------------------------------------
+  // Prepare model
+  // ------------------------------------------------------------
+
+  auto *const model = new QStandardItemModel(this);
+
+  model->setHorizontalHeaderLabels(
+      QStringList() <<
+      StrConstants::getContentsOf().arg(pkgName));
+
+  QStandardItem *const root =
+      model->invisibleRootItem();
+
+  const QIcon iconFolder =
+      IconHelper::getIconFolder();
+
+  const QIcon iconBinary =
+      IconHelper::getIconBinary();
+
+  // Full-path lookup.
+  QHash<QString, QStandardItem *> dirMap;
+
+  dirMap.reserve(fileList.size() / 4 + 1);
+  dirMap.insert(QString(), root);
+
+  const int totalFiles = fileList.size();
+  const int progressStep =
+      qMax(1, totalFiles / 100);
+
+  int counter = 0;
+
+  // ------------------------------------------------------------
+  // Disable expensive GUI operations while building
+  // ------------------------------------------------------------
+
+  tvPkgFileList->setUpdatesEnabled(false);
+  tvPkgFileList->setSortingEnabled(false);
+  tvPkgFileList->setAnimated(false);
+
+  model->blockSignals(true);
+
+  m_progressWidget->setRange(0, totalFiles);
+  m_progressWidget->setValue(0);
+  m_progressWidget->show();
+
+  // ------------------------------------------------------------
+  // Build tree
+  // ------------------------------------------------------------
+
+  for (const QString &file : fileList)
+  {
+    const bool isDir =
+        file.endsWith(QLatin1Char('/'));
+
+    QString normalizedPath = file;
+
+    if (isDir && normalizedPath.size() > 1)
+      normalizedPath.chop(1);
+
+    const qsizetype lastSep =
+        normalizedPath.lastIndexOf(QLatin1Char('/'));
+
+    QString parentPath;
+    QString baseName;
+
+    if (lastSep < 0)
+    {
+      baseName = normalizedPath;
+    }
+    else if (lastSep == 0)
+    {
+      baseName = normalizedPath.mid(1);
+    }
+    else
+    {
+      parentPath =
+          normalizedPath.left(lastSep);
+
+      baseName =
+          normalizedPath.mid(lastSep + 1);
+    }
+
+    if (baseName.isEmpty())
+      continue;
+
+    // --------------------------------------------------------
+    // Avoid filesystem access unless absolutely necessary
+    // --------------------------------------------------------
+
+    const bool treatAsDir = isDir;
+
+    QStandardItem *item =
+        new QStandardItem(
+            treatAsDir ? iconFolder : iconBinary,
+            baseName);
+
+    item->setAccessibleDescription(
+        treatAsDir
+            ? QLatin1String("directory ") + baseName
+            : QLatin1String("file ") + baseName);
+
+    QStandardItem *parentItem =
+        ensureDirectoryExists(
+            parentPath,
+            dirMap,
+            root,
+            iconFolder);
+
+    parentItem->appendRow(item);
+
+    if (treatAsDir)
+    {
+      dirMap.insert(normalizedPath, item);
+    }
+
+    ++counter;
+
+    if ((counter % progressStep) == 0 ||
+        counter == totalFiles)
+    {
+      m_progressWidget->setValue(counter);
+    }
+  }
+
+  model->blockSignals(false);
+
+  m_progressWidget->close();
+
+  // ------------------------------------------------------------
+  // Sort only once
+  // ------------------------------------------------------------
+
+  model->sort(0, Qt::AscendingOrder);
+
+  // ------------------------------------------------------------
+  // Replace model
+  // ------------------------------------------------------------
+
+  QAbstractItemModel *const oldModel =
+      tvPkgFileList->model();
+
+  tvPkgFileList->setModel(model);
+
+  tvPkgFileList->header()->setDefaultAlignment(
+      Qt::AlignCenter);
+
+  // ------------------------------------------------------------
+  // Expand only if really necessary
+  // ------------------------------------------------------------
+
+  if (counter > 0)
+  {
+    tvPkgFileList->expandAll();
+    //tvPkgFileList->expandToDepth(0);
+  }
+
+  if (oldModel && oldModel != model)
+    oldModel->deleteLater();
+
+  tvPkgFileList->setUpdatesEnabled(true);
+  tvPkgFileList->viewport()->update();
+
+  if (m_debugInfo)
+  {
+    std::cout
+        << "Time for contents of "
+        << pkgName.toLatin1().data()
+        << " (" << counter << "): "
+        << m_time->elapsed()
+        << " milliseconds."
+        << std::endl;
+  }
+
+  m_cachedPackageInFiles = cacheKey;
+
+  if (neverQuit)
+  {
+    changeTabWidgetPropertiesIndex(
+        ctn_TABINDEX_FILES);
+
+    selectFirstItemOfPkgFileList();
+  }
+
+  closeTabFilesSearchBar();
+
+  if (filterHasFocus)
+    m_leFilterPackage->setFocus();
+  else if (tvPackagesHasFocus)
+    ui->tvPackages->setFocus();
+}
+
+/*
+ * NEW optimized CODE
+ *
+ * Ensures that a directory and all its ancestors exist in the map/model.
+ * Returns the QStandardItem* corresponding to the path.
+ */
+QStandardItem *MainWindow::ensureDirectoryExists(
+    const QString &path,
+    QHash<QString, QStandardItem *> &dirMap,
+    QStandardItem *root,
+    const QIcon &iconFolder)
+{
+  if (path.isEmpty())
+    return root;
+
+  auto found = dirMap.constFind(path);
+  if (found != dirMap.constEnd())
+    return found.value();
+
+  QStandardItem *parentItem = root;
+
+  qsizetype start = 0;
+
+  while (start < path.size())
+  {
+    qsizetype slash =
+        path.indexOf(QLatin1Char('/'), start);
+
+    if (slash < 0)
+      slash = path.size();
+
+    const QString component =
+        path.mid(start, slash - start);
+
+    if (!component.isEmpty())
+    {
+      const QString currentPath =
+          path.left(slash);
+
+      auto it =
+          dirMap.constFind(currentPath);
+
+      if (it != dirMap.constEnd())
+      {
+        parentItem = it.value();
+      }
+      else
+      {
+        auto *item =
+            new QStandardItem(
+                iconFolder,
+                component);
+
+        item->setAccessibleDescription(
+            QLatin1String("directory ") +
+            component);
+
+        parentItem->appendRow(item);
+
+        dirMap.insert(
+            currentPath,
+            item);
+
+        parentItem = item;
+      }
+    }
+
+    start = slash + 1;
+  }
+
+  return parentItem;
+}
+
+/*
+ * Re-populates the treeview which contains the file list of selected package (tab TWO)
+ */
+/*void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
 {  
   if (m_progressWidget->isVisible() || !m_initializationCompleted) return;
 
@@ -1100,6 +1480,7 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
   if (filterHasFocus) m_leFilterPackage->setFocus();
   else if (tvPackagesHasFocus) ui->tvPackages->setFocus();
 }
+*/
 
 /*
  * This SLOT is called every time we press a key at FilterLineEdit

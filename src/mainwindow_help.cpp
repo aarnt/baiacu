@@ -62,7 +62,7 @@ void MainWindow::initTabHelpUsage()
   html +=
       QString("<a href=\"https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html\">LGPL v2.1</a>.</p></h3><br>"); //+
       //QString("<h4><p>") + strForMoreInfo + " " +
-      //QString("<a href=\"https://tintaescura.com/projects/octopkg\">https://tintaescura.com/projects/octopkg</a>.</p></h4><br>");
+      //QString("<a href=\"https://tintaescura.inf95.org/projects/octopkg\">https://tintaescura.inf95.org/projects/octopkg</a>.</p></h4><br>");
 
   html += tr("Package classification:") +
   QString("<ul type=\"square\"><li>") + iconPath + "installed.png\"/> " +
@@ -189,7 +189,7 @@ void MainWindow::onHelpAbout()
   aboutText += StrConstants::getVersion() + QLatin1String(": ") + StrConstants::getApplicationVersion() +
       QLatin1String(" - ") + StrConstants::getQtVersion() + QLatin1String("<br>");
   aboutText += StrConstants::getURL() + QLatin1String(": ") +
-    QStringLiteral("<a href=\"https://tintaescura.com/projects/baiacu/\">https://tintaescura.com/projects/baiacu</a><br>");
+    QStringLiteral("<a href=\"https://tintaescura.inf95.org/projects/baiacu/\">https://tintaescura.inf95.org/projects/baiacu</a><br>");
   aboutText += StrConstants::getLicenses() + QLatin1String(": ") +
       QStringLiteral("<a href=\"https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html\">LGPL v2.1</a><br><br>");
   aboutText += QStringLiteral("&copy; Alexandre Albuquerque Arnt<br><br>");

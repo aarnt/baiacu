@@ -290,6 +290,9 @@ private:
   void retrieveUnrequiredPackageList();
   bool isInternetAvailable();
 
+  QStandardItem *ensureDirectoryExists(const QString &path, QHash<QString, QStandardItem *> &dirMap,
+      QStandardItem *root, const QIcon &iconFolder);
+
 private slots:
   void initToolButtonPacman();
   void deferredInitAppIcon();
