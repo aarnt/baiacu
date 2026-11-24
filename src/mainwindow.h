@@ -233,6 +233,9 @@ private:
   QString extractBaseFileName(const QString &fileName);
   QString getSelectedDirectory();
 
+  QStandardItem *ensureDirectoryExists(const QString &path, QHash<QString, QStandardItem *> &dirMap,
+      QStandardItem *root, const QIcon &iconFolder);
+
   void initTabFiles();
   void initActions();
   void refreshStatusBar();
@@ -289,9 +292,6 @@ private:
   void switchToViewAllPackages();
   void retrieveUnrequiredPackageList();
   bool isInternetAvailable();
-
-  QStandardItem *ensureDirectoryExists(const QString &path, QHash<QString, QStandardItem *> &dirMap,
-      QStandardItem *root, const QIcon &iconFolder);
 
 private slots:
   void initToolButtonPacman();

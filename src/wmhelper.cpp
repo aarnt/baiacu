@@ -133,7 +133,7 @@ bool WMHelper::isOPENBOXRunning(){
   if (out.count(ctn_OPENBOX_DESKTOP)>0)
     return true;
   else
-      return false;
+    return false;
 }
 
 /*
@@ -325,15 +325,12 @@ void WMHelper::editFile( const QString& fileName, EditOptions opt ){
   else if (isMATERunning() && UnixCommand::hasTheExecutable(ctn_MATE_EDITOR)){
     p = ctn_MATE_EDITOR + " " + fileName;
   }
-  else if (isLXQTRunning() && UnixCommand::hasTheExecutable(ctn_LXQT_EDITOR)){
-    p = ctn_LXQT_EDITOR + " " + fileName;
-  }
   else if (isLXQTRunning() && UnixCommand::hasTheExecutable(ctn_LXQT_EDITOR_ALT)){
     p = ctn_LXQT_EDITOR_ALT + " " + fileName;
   }
-  else if (isLuminaRunning() && UnixCommand::hasTheExecutable(ctn_LUMINA_EDITOR)){
+  /*else if (isLuminaRunning() && UnixCommand::hasTheExecutable(ctn_LUMINA_EDITOR)){
     p += ctn_LUMINA_EDITOR + " " + fileName;
-  }
+  }*/
   else if (UnixCommand::hasTheExecutable(ctn_ARCHBANG_EDITOR))
   {
     p = ctn_ARCHBANG_EDITOR + " " + fileName;

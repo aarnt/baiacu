@@ -338,12 +338,11 @@ void MainWindow::metaBuildPackageList()
     if(!m_leFilterPackage->text().isEmpty())
     {
       m_toolButtonPacman->hide();
-      disconnect(&g_fwRemoteMeta, SIGNAL(finished()), this, SLOT(preBuildRemotePackageListMeta()));
-
       QFuture<QList<PackageListData> *> f;
+      disconnect(&g_fwRemote, SIGNAL(finished()), this, SLOT(preBuildRemotePackageList()));
       f = QtConcurrent::run(searchRemotePackages, m_leFilterPackage->text());
-      connect(&g_fwRemoteMeta, SIGNAL(finished()), this, SLOT(preBuildRemotePackageListMeta()));
-      g_fwRemoteMeta.setFuture(f);
+      g_fwRemote.setFuture(f);
+      connect(&g_fwRemote, SIGNAL(finished()), this, SLOT(preBuildRemotePackageList()));
     }
     else
     {
@@ -954,7 +953,7 @@ void MainWindow::refreshTabFiles(bool clearContents, bool neverQuit)
     return;
   }
 
-  const bool installed = package->installed();
+  //const bool installed = package->installed();
   const QString pkgName = package->name;
 
   // ------------------------------------------------------------
@@ -1479,8 +1478,7 @@ QStandardItem *MainWindow::ensureDirectoryExists(
 
   if (filterHasFocus) m_leFilterPackage->setFocus();
   else if (tvPackagesHasFocus) ui->tvPackages->setFocus();
-}
-*/
+}*/
 
 /*
  * This SLOT is called every time we press a key at FilterLineEdit
